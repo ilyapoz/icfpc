@@ -13,33 +13,35 @@ def play(game, screen):
         screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Ctr+C to quit.')
         screen.addstr(5, 5, '          %s' % str(last_res))
 
-        screen.addstr(7, 0, game.board.get_field_str(ext=0))
+        screen.addstr(7, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
         screen.refresh()
 
         key = screen.getch()
 
         next_pos = None
         if key in map(ord, ['w', 'W']):
-            next_pos = game.cur_position.west()
+            next_pos = game.cur_unit_pos().west()
         elif key in map(ord, ['e', 'E']):
-            next_pos = game.cur_position.east()
+            next_pos = game.cur_unit_pos().east()
         elif key in map(ord, ['a', 'A']):
-            next_pos = game.cur_position.south_west()
+            next_pos = game.cur_unit_pos().south_west()
         elif key in map(ord, ['d', 'D']):
-            next_pos = game.cur_position.south_east()
+            next_pos = game.cur_unit_pos().south_east()
         elif key in map(ord, ['q', 'Q']):
-            next_pos = game.cur_position.ccw()
+            next_pos = game.cur_unit_pos().ccw()
         elif key in map(ord, ['r', 'R']):
-            next_pos = game.cur_position.cw()
+            next_pos = game.cur_unit_pos().cw()
+        elif key in map(ord, ['z', 'Z']):
+            last_res = 'Undo'
+            game.undo()
 
-        if next_pos != None:
+        if next_pos is not None:
             move_result = game.try_pos(next_pos)
             last_res = move_result
             if move_result != emu.Game.MoveResult.Loss:
                 game.commit_pos(next_pos)
 
         screen.clear()
-        screen.addstr(6, 5, 'You have entered %d' % key)
 
     return ''
 
