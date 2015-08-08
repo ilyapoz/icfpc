@@ -92,10 +92,14 @@ class Position:
         return Position(self.unit, (self.pivot[0]+1, self.pivot[1]), self.rotation)
 
     def south_west(self):
-        raise NotImplemented
+        unit = Unit.field_to_unit_space(self.pivot)
+        unit = (unit[0] - 1, unit[1] + 1)
+        return Position(self.unit, Unit.unit_to_field_space(unit), self.rotation)
 
     def south_east(self):
-        raise NotImplemented
+        unit = Unit.field_to_unit_space(self.pivot)
+        unit = (unit[0], unit[1] + 1)
+        return Position(self.unit, Unit.unit_to_field_space(unit), self.rotation)
 
     def cw(self):
         return Position(self.unit, self.pivot, self.rotation + 1)
@@ -263,9 +267,10 @@ if __name__ == "__main__":
     unit = units[unit_index]
 
     pos = Position(unit)
-    pos.pivot = (5, 5)
+    pos.pivot = unit.starting_position
     pos.rotation = 0
 
-    pos.pivot = unit.starting_position
+    pos = pos.south_west()
+
     pos.draw(board)
     board.draw_field()
