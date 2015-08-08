@@ -214,16 +214,15 @@ class Game:
         return self.try_pos(self.cur_position.ccw())
 
     def spawn(self):
-        self.prev = []
-        pass
+        self.prev = numpy.zeros((width, height), int)
 
     def try_pos(self, pos):
         for x, y in pos.field_space():
             if not board.in_board((x, y)) or self.board.field[x, y]:
-                return MoveResult.Lock
+                return Game.MoveResult.Lock
 
         self.cur_position = pos
-        return MoveResult.Continue
+        return Game.MoveResult.Continue
 
     def undo(self):
         raise NotImplemented
