@@ -135,7 +135,7 @@ class Board:
         self.pivot = (-1, -1)
 
     def filled_lines(self):
-        pass
+        return numpy.nonzero(numpy.sum(self.field, 0) == self.width)[0].tolist()
 
     def clear_line(self, y):
         # Move one line down
