@@ -4,24 +4,31 @@ import numpy
 import json
 import sys
 import os
+import unittest
 
 class Unit:
     def __init__(self, cells, pivot):
-        pivot = field_to_piece_space([pivot['x'], pivot['y'])
-        
-        self.cells = map(lambda x: [x['x'] - pivot['x'], x['y'] - pivot['y']], cells)
+        pivot = Unit.field_to_piece_space((pivot['x'], pivot['y']))
+
+        self.cells = map(lambda x: [x['x'] - pivot[0], x['y'] - pivot[0]], cells)
         self.rotation = 0
 
-    def rotatecw(self):
+    def cw(self):
         self.rotation = self.rotation - 1
 
-    def rotateccw(self):
+    def ccw(self):
         self.rotation = self.rotation + 1
 
-    def movesw(self):
+    def sw(self):
         pass
 
-    def movese(self):
+    def se(self):
+        pass
+
+    def w(self):
+        pass
+
+    def e(self):
         pass
 
     def draw(self, board, position):
@@ -30,11 +37,11 @@ class Unit:
 
     @staticmethod
     def field_to_piece_space(coords):
-        return [coords[0], ]
+        return (coords[0] - coords[1] / 2, coords[1])
 
     @staticmethod
     def piece_to_field_space(coords):
-        return []
+        return (coords[0] + coords[1] / 2, coords[1])
 
     @staticmethod
     def rotate(cell, rotation):
@@ -83,7 +90,7 @@ class Game:
         self.units = units
 
     def try_sw(self):
-        """ 
+        """
             returns MoveResult
         """
         pass
@@ -103,9 +110,19 @@ class Game:
     def redo(self):
         pass
 
+class TestUnit(unittest.TestCase):
+    def test_sanity(self):
+        for x in range(-100, 100):
+            for y in range(-100, 100):
+                to_piece = Unit.field_to_piece_space((x, y))
+                to_field = Unit.piece_to_field_space(to_piece)
+
+                self.assertEqual(to_field, (x, y))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f')
+    parser.add_argument('--test', '-t')
 
     args = parser.parse_args()
 
@@ -113,6 +130,14 @@ if __name__ == "__main__":
 
     board = Board(input_data['width'], input_data['height'], input_data['filled'])
     units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
+
+    if args.test:
+        unittest.main()
+        sys.exit(0)
+
     board.create_unit(units[0])
     board.draw()
     board.fix_unit()
+
+    print Unit.field_to_piece_space((0, 2))
+    print Unit.piece_to_field_space((0, 2))
