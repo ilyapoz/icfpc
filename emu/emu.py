@@ -108,6 +108,17 @@ class Position:
     def hash(self):
         return hash(str(sorted(list(self.field_space()))))
 
+    def apply_char(self, c):
+        if c in {'p', "'", '!', '.', '0', '3'}: return self.west()
+        if c in {'b', 'c', 'e', 'f', 'y', '2'}: return self.east()
+        if c in {'a', 'g', 'h', 'i', 'j', '4'}: return self.south_west()
+        if c in {'l', 'm', 'n', 'o', ' ', '5'}: return self.south_east()
+        if c in {'d', 'q', 'r', 'v', 'z', '1'}: return self.cw()
+        if c in {'k', 's', 't', 'u', 'w', 'x'}: return self.ccw()
+        if c in {"\t", "\n", "\r"}: pass
+
+        assert False
+
 
 class Board:
     def __init__(self, width, height, filled=None, field=None):
@@ -211,14 +222,23 @@ class Game:
         line_bonus = (lines_cleared_prev - 1) * points / 10 if lines_cleared_prev > 1 else 0
         return points + line_bonus
 
+    def compute_points_for_phrase(self, phrase):
+        phrase = phrase.tolower()
+        old_reps = self.current_state().casted_phrases.get(phrase, 0)
+        if old_reps:
+            return len(phrase) * 2
+        else:
+            return len(phrase) * 2 + 300
+
     class State:
-        def __init__(self, unit_index, unit_pos, board, score, visited_positions, lines_cleared_prev):
+        def __init__(self, unit_index, unit_pos, board, score, visited_positions, lines_cleared_prev, casted_phrases):
             self.unit_index = unit_index
             self.unit_pos = unit_pos
             self.board = board
             self.score = score
             self.visited_positions = visited_positions
             self.lines_cleared_prev = lines_cleared_prev
+            self.casted_phrases = casted_phrases
 
     def __init__(self, board, unit_generator):
         self.unit_generator = unit_generator
@@ -228,7 +248,7 @@ class Game:
         self.switch_to_next_unit(board, 0, 0)
 
     def switch_to_next_unit(self, board, score, lines_cleared):
-        cur_unit_index = -1 if len(self.state_stack) == 0 else self.state_stack[-1].unit_index
+        cur_unit_index = -1 if len(self.state_stack) == 0 else self.current_state().unit_index
         next_unit_index = cur_unit_index + 1
 
         logging.debug('switch_to_next_unit, cur_index=%d, next_index=%d, unit_count=%d' % (cur_unit_index, next_unit_index, len(self.units)))
@@ -240,7 +260,9 @@ class Game:
 
         next_unit = self.units[next_unit_index]
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
-        self.state_stack.append(Game.State(next_unit_index, next_unit_pos, board, score, PersistentStack(), lines_cleared))
+        next_phrases = {} if len(self.state_stack) == 0 else dict(self.current_state().casted_phrases)
+
+        self.state_stack.append(Game.State(next_unit_index, next_unit_pos, board, score, PersistentStack(), lines_cleared, next_phrases))
         if next_unit_index == 0 or self.try_pos_on_board(next_unit_pos, board) == Game.MoveResult.Continue:
             logging.debug('Piece %d started' % next_unit_index)
         else:
@@ -250,14 +272,17 @@ class Game:
     def ended(self):
         return self.game_ended
 
+    def current_state(self):
+        return self.state_stack[-1]
+
     def score(self):
-        return self.state_stack[-1].score
+        return self.current_state().score
 
     def cur_unit_pos(self):
-        return None if self.ended() else self.state_stack[-1].unit_pos
+        return None if self.ended() else self.current_state().unit_pos
 
     def board(self):
-        return self.state_stack[-1].board
+        return self.current_state().board
 
     def commit_pos(self, pos):
         assert not self.ended()
@@ -272,12 +297,13 @@ class Game:
             self.switch_to_next_unit(new_board, self.score() + move_score, lines_cleared)
         elif move_result == Game.MoveResult.Continue:
             self.state_stack.append(Game.State(
-                self.state_stack[-1].unit_index,
+                self.current_state().unit_index,
                 pos,
-                self.state_stack[-1].board,
-                self.state_stack[-1].score,
-                self.state_stack[-1].visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation)),
-                self.state_stack[-1].lines_cleared_prev))
+                self.current_state().board,
+                self.current_state().score,
+                self.current_state().visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation)),
+                self.current_state().lines_cleared_prev,
+                dict(self.current_state().casted_phrases)))
         else:
             logging.debug(move_result)
             assert False
@@ -286,7 +312,7 @@ class Game:
         return self.try_pos_on_board(pos, self.board())
 
     def try_pos_on_board(self, pos, board):
-        if (pos.pivot[0], pos.pivot[1], pos.rotation) in self.state_stack[-1].visited_positions.items():
+        if (pos.pivot[0], pos.pivot[1], pos.rotation) in self.current_state().visited_positions.items():
             return Game.MoveResult.Loss
 
         for x, y in pos.field_space():
@@ -295,11 +321,40 @@ class Game:
 
         return Game.MoveResult.Continue
 
-    def undo(self):
+    def undo(self, steps=1):
         if self.game_ended:
             self.game_ended = False
-        if len(self.state_stack) > 1:
-            self.state_stack.pop()
+        for i in range(steps):
+            if len(self.state_stack) > 1:
+                self.state_stack.pop()
+
+    def try_phrose(self, phrase, commit):
+        phrase = phrase.tolower()
+        committed = 0
+        try:
+            for c in phrase:
+                if self.cur_unit_pos() is None:
+                    raise StopIteration
+                next_pos = self.cur_unit_pos().apply_char(c)
+
+                if self.try_pos(next_pos) == Game.MoveResult.Loss:
+                    raise StopIteration
+
+                self.commit_pos(next_pos)
+                committed += 1
+
+        except StopIteration:
+            assert not commit
+            return 0
+        finally:
+            if not commit:
+                self.undo(committed)
+
+        if commit:
+            old = self.current_state().casted_phrases.get(phrase, 0)
+            self.current_state().casted_phrases[phrase] = old + 1
+
+        return self.compute_points_for_phrase(phrase)
 
 
 class UnitGenerator:
