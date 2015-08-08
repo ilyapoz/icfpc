@@ -132,9 +132,19 @@ class Board:
         for x in range(0, self.width):
             self.field[x, 0] = 0
 
-    def fix_unit(self, pos):
+    def clear_filled_lines(self):
+        filled = self.filled_lines()
+        for l in filled:
+            self.clear_line(l)
+
+        return len(filled)
+
+    def fix_unit_and_clear(self, pos):
         for x, y in pos.field_space():
             self.field[x, y] = 1
+
+        return self.clear_filled_lines()
+
 
     def get_field_str_impl(self, expr, ext=0):
         result = ''
@@ -212,7 +222,7 @@ class Game:
         assert move_result != Game.MoveResult.Loss
 
         if move_result == Game.MoveResult.Lock:
-            self.board.fix_unit()
+            self.board.fix_unit_and_clear()
             self.try_get_next_unit()
         elif move_result == Game.MoveResult.Continue:
             pos.draw(self.board)
