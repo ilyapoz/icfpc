@@ -61,19 +61,17 @@ class Unit:
         field_space = list(pos.field_space())
         field_width = width + 0.5
 
-        left_coord = min([x + (y - min_y) % 2 * 0.5 for x, y in field_space])
-        right_coord = max([x + 1 + (y - min_y) % 2 * 0.5 for x, y in field_space])
+        left_coord = min([x + y % 2 * 0.5 for x, y in field_space])
+        right_coord = max([x + 1 + y % 2 * 0.5 for x, y in field_space])
 
-        self.starting_position = (math.floor((width - (left_coord + right_coord)) / 2), -min_y)
+        self.starting_position = (math.floor((field_width - (left_coord + right_coord)) / 2), -min_y)
 
 
 class Position:
-    unit = None
-    pivot = (0, 0)
-    rotation = 0 # cw rotation
-
-    def __init__(self, unit):
+    def __init__(self, unit, pivot=(0, 0), rotation=0):
         self.unit = unit
+        self.pivot = pivot
+        self.rotation = rotation
 
     def field_space(self):
         for cell in self.unit.cells:
@@ -86,6 +84,24 @@ class Position:
         board.pivot = self.pivot
         for x, y in self.field_space():
             board.unit[x, y] = True
+
+    def west(self):
+        return Position(self.unit, (self.pivot[0]-1, self.pivot[1]), self.rotation)
+
+    def east(self):
+        return Position(self.unit, (self.pivot[0]+1, self.pivot[1]), self.rotation)
+
+    def south_west(self):
+        raise NotImplemented
+
+    def south_east(self):
+        raise NotImplemented
+
+    def cw(self):
+        return Position(self.unit, self.pivot, self.rotation + 1)
+
+    def ccw(self):
+        return Position(self.unit, self.pivot, self.rotation - 1)
 
     def hash(self):
         return hash(str(sorted(list(self.field_space()))))
@@ -114,18 +130,23 @@ class Board:
     def create_unit(self, unit):
         self.clear_unit()
 
-    def draw(self, expr, ext=0):
+    def get_field_str_impl(self, expr, ext=0):
+        result = ''
         for y in xrange(0, self.height):
             if y % 2:
-                print ' ' * ext,
+                result += ' ' * (ext + 1)
 
             for x in xrange(0, self.width):
-                print expr(x, y) + ' ' * ext,
+                result += expr(x, y) + ' ' * (ext + 1)
 
-            print '\n' * ext
+            result += '\n' * (ext + 1)
+        return result
+
+    def get_field_str(self, ext=0):
+        return self.get_field_str_impl(lambda x, y: self.sym(x, y), ext)
 
     def draw_field(self, ext=0):
-        self.draw(lambda x, y: self.sym(x, y), ext)
+        print self.get_field_str(ext)
 
     def sym(self, x, y):
         if self.field[x, y]:
@@ -139,6 +160,7 @@ class Board:
 
     syms = (('.', 'o'), ('*', '@'))
 
+
 class Game:
     class MoveResult:
         Loss = 0
@@ -148,6 +170,13 @@ class Game:
     def __init__(self, board, unit_generator):
         self.board = board
         self.unit_generator = unit_generator
+        self.cur_score = 0
+
+    def ended(self):
+        return False
+
+    def score(self):
+        return self.cur_score
 
     def try_sw(self):
         """
@@ -173,6 +202,7 @@ class Game:
 
 class UnitGenerator:
     def __init__(self, units, source_seed, source_length):
+        self.source_seed = source_seed
         self.current_seed = source_seed
         self.emitted_unit_count = 0
         self.source_length = source_length
