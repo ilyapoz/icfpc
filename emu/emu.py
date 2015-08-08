@@ -49,8 +49,8 @@ class Unit:
 
     def extent(self):
         return (
-            max(x[0] for x in self.cells) - min(x[0] for x in self.cells),
-            max(x[1] for x in self.cells) - min(x[1] for x in self.cells)
+            max(x[0] for x in self.cells) - min(x[0] for x in self.cells) + 1,
+            max(x[1] for x in self.cells) - min(x[1] for x in self.cells) + 1
         )
 
     def calc_starting_position(self, width):
@@ -112,7 +112,7 @@ class Board:
         pass
 
     def create_unit(self, unit):
-        pass
+        self.clear_unit()
 
     def draw(self, expr, ext=0):
         for y in xrange(0, self.height):
