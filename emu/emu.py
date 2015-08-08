@@ -110,11 +110,10 @@ class Position:
 
 
 class Board:
-    def __init__(self, width, height, filled):
+    def __init__(self, width, height, filled=None, field=None):
         self.width = width
         self.height = height
-
-        self.field = numpy.zeros((width, height), int)
+        self.field = numpy.zeros((width, height), int) if not field else numpy.copy(field)
         for cell in filled:
             self.field[cell['x'], cell['y']] = 1
 
@@ -124,7 +123,7 @@ class Board:
     def filled_lines(self):
         return numpy.nonzero(numpy.sum(self.field, 0) == self.width)[0].tolist()
 
-    def clear_line(self, y):
+    def __clear_line(self, y):
         # Move one line down
         for yy in range(y - 1, -1, -1):
             for x in range(0, self.width):
@@ -132,18 +131,19 @@ class Board:
         for x in range(0, self.width):
             self.field[x, 0] = 0
 
-    def clear_filled_lines(self):
+    def __clear_filled_lines(self):
         filled = self.filled_lines()
         for l in filled:
-            self.clear_line(l)
+            self.__clear_line(l)
 
         return len(filled)
 
     def fix_unit_and_clear(self, pos):
+        new_board = Board(self.width, self.height, field = self.field)
         for x, y in pos.field_space():
-            self.field[x, y] = 1
+            new_board.field[x, y] = 1
 
-        return self.clear_filled_lines()
+        return (new_board, new_board.__clear_filled_lines())
 
 
     def get_field_str_impl(self, expr, ext=0):
@@ -322,8 +322,4 @@ if __name__ == "__main__":
 
     pos = pos.south_west()
 
-    board.clear_line(11)
-    board.clear_line(13)
-    board.clear_line(13)
     board.draw_field(pos)
-    logging.debug(board.filled_lines())
