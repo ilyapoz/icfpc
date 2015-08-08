@@ -102,10 +102,10 @@ class Position:
         return Position(self.unit, Unit.unit_to_field_space(unit), self.rotation)
 
     def cw(self):
-        return Position(self.unit, self.pivot, self.rotation + 1)
+        return Position(self.unit, self.pivot, self.rotation + 1 % self.unit.symmetry_class)
 
     def ccw(self):
-        return Position(self.unit, self.pivot, self.rotation - 1)
+        return Position(self.unit, self.pivot, self.rotation - 1 % self.unit.symmetry_class)
 
     def hash(self):
         return hash(str(sorted(list(self.field_space()))))
@@ -169,9 +169,12 @@ class Board:
 
 class Game:
     class MoveResult:
-        Loss = 0
-        Lock = 1
-        Continue = 2
+        Loss = 'Loss'
+        Lock = 'Lock'
+        Continue = 'Ok'
+
+    class GameOver(Exception):
+        pass
 
     def __init__(self, board, unit_generator):
         self.board = board
@@ -184,8 +187,13 @@ class Game:
 
     def try_get_next_unit(self):
         try:
+            self.prev = []
             self.cur_unit = self.unit_generator.next()
-            self.cur_position = Position(self.cur_unit, self.cur_unit.starting_position, 0)
+            pos = Position(self.cur_unit, self.cur_unit.starting_position, 0)
+            if self.try_pos(pos):
+                self.cur_position = pos
+            else:
+                self.cur_init = None
         except StopIteration:
             self.cur_unit = None
 
@@ -201,7 +209,6 @@ class Game:
 
         if move_result == Game.MoveResult.Lock:
             self.board.fix_unit()
-            self.prev = []
             self.try_get_next_unit()
         elif move_result == Game.MoveResult.Continue:
             pos.draw(self.board)

@@ -6,37 +6,40 @@ import curses
 
 
 def play(game, screen):
+    last_res = ''
     while not game.ended():
         screen.addstr(1, 5, 'Score: %d' % game.score())
-        screen.addstr(3, 5, 'Controls: W to go west, E to go east, S to go south west, D to go south east,')
+        screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
         screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Ctr+C to quit.')
+        screen.addstr(5, 5, '          %s' % str(last_res))
 
-        screen.addstr(6, 0, game.board.get_field_str(ext=0))
+        screen.addstr(7, 0, game.board.get_field_str(ext=0))
         screen.refresh()
 
         key = screen.getch()
 
         next_pos = None
-        if key == ord('w') or key == ord('W'):
+        if key in map(ord, ['w', 'W']):
             next_pos = game.cur_position.west()
-        elif key == ord('e') or key == ord('E'):
+        elif key in map(ord, ['e', 'E']):
             next_pos = game.cur_position.east()
-        elif key == ord('s') or key == ord('S'):
+        elif key in map(ord, ['a', 'A']):
             next_pos = game.cur_position.south_west()
-        elif key == ord('d') or key == ord('D'):
+        elif key in map(ord, ['d', 'D']):
             next_pos = game.cur_position.south_east()
-        elif key == ord('q') or key == ord('Q'):
+        elif key in map(ord, ['q', 'Q']):
             next_pos = game.cur_position.ccw()
-        elif key == ord('r') or key == ord('R'):
+        elif key in map(ord, ['r', 'R']):
             next_pos = game.cur_position.cw()
 
         if next_pos != None:
             move_result = game.try_pos(next_pos)
+            last_res = move_result
             if move_result != emu.Game.MoveResult.Loss:
                 game.commit_pos(next_pos)
 
         screen.clear()
-        screen.addstr(5, 5, 'You have entered %d' % key)
+        screen.addstr(6, 5, 'You have entered %d' % key)
 
     return ''
 
