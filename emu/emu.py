@@ -68,12 +68,10 @@ class Unit:
 
 
 class Position:
-    unit = None
-    pivot = (0, 0)
-    rotation = 0 # cw rotation
-
-    def __init__(self, unit):
+    def __init__(self, unit, pivot=(0, 0), rotation=0):
         self.unit = unit
+        self.pivot = pivot
+        self.rotation = rotation
 
     def field_space(self):
         for cell in self.unit.cells:
@@ -86,6 +84,24 @@ class Position:
         board.pivot = self.pivot
         for x, y in self.field_space():
             board.unit[x, y] = True
+
+    def west(self):
+        return Position(self.unit, (self.pivot[0]-1, self.pivot[1]), self.rotation)
+
+    def east(self):
+        return Position(self.unit, (self.pivot[0]+1, self.pivot[1]), self.rotation)
+
+    def south_west(self):
+        raise NotImplemented
+
+    def south_east(self):
+        raise NotImplemented
+
+    def cw(self):
+        return Position(self.unit, self.pivot, self.rotation + 1)
+
+    def ccw(self):
+        return Position(self.unit, self.pivot, self.rotation - 1)
 
     def hash(self):
         return hash(str(sorted(list(self.field_space()))))
@@ -143,6 +159,7 @@ class Board:
 
 
     syms = (('.', 'o'), ('*', '@'))
+
 
 class Game:
     class MoveResult:
