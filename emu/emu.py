@@ -194,25 +194,26 @@ class Game:
         return self.cur_score
 
     def try_west(self):
-        self.try_pos(self.cur_position.west())
+        return self.try_pos(self.cur_position.west())
 
     def try_east(self):
-        self.try_pos(self.cur_position.east())
+        return self.try_pos(self.cur_position.east())
 
     def try_south_west(self):
-        self.try_pos(self.cur_position.south_west())
+        return self.try_pos(self.cur_position.south_west())
 
     def try_south_east(self):
-        self.try_pos(self.cur_position.south_east())
+        return self.try_pos(self.cur_position.south_east())
 
     def try_cw(self):
-        self.try_pos(self.cur_position.cw())
+        return self.try_pos(self.cur_position.cw())
 
     def try_ccw(self):
-        self.try_pos(self.cur_position.ccw())
+        return self.try_pos(self.cur_position.ccw())
 
     def try_pos(self, new_position):
-        return True
+        self.cur_position = new_position
+        return Game.MoveResult.Continue
 
     def undo(self):
         raise NotImplemented

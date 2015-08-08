@@ -9,22 +9,31 @@ def play(game, screen):
     while not game.ended() and not stop_game:
         screen.addstr(1, 5, 'Score: %d' % game.score())
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, S to go south west, D to go south east,')
-        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Q to quit.')
+        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Backspace to quit.')
 
         game.cur_position.draw(game.board)
         screen.addstr(6, 0, game.board.get_field_str(ext=1))
         screen.refresh()
 
         key = screen.getch()
-        if key == 'w' or key == 'W':
-            game.try_west()
-        elif key == 'e' or key == 'E':
-            game.try_east()
+        move_result = None
+        if key == ord('w') or key == ord('W'):
+            move_result = game.try_west()
+        elif key == ord('e') or key == ord('E'):
+            move_result = game.try_east()
+        elif key == ord('s') or key == ord('S'):
+            move_result = game.try_south_west()
+        elif key == ord('d') or key == ord('D'):
+            move_result = game.try_south_east()
+        elif key == ord('q') or key == ord('Q'):
+            move_result = game.try_ccw()
+        elif key == ord('r') or key == ord('R'):
+            move_result = game.try_cw()
 
         screen.clear()
         screen.addstr(5, 5, 'You have entered %d' % key)
 
-        if key == ord('q'):
+        if key == curses.KEY_BACKSPACE:
             stop_game = True
 
     return ''
