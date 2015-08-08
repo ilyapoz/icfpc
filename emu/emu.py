@@ -5,6 +5,7 @@ import json
 import sys
 import os
 import unittest
+import math
 
 class Unit:
     def __init__(self, cells, pivot):
@@ -45,6 +46,21 @@ class Unit:
             pos.rotation += 1
 
         return pos.rotation
+
+    def calc_starting_position(self, width):
+        min_y = min([x[1] for x in self.cells])
+
+        pos = Position(self);
+        pos.pivot = (0, -min_y)
+        field_space = list(pos.field_space())
+        field_width = width + 0.5
+
+        left_coord = min([x + (y - min_y) % 2 * 0.5 for x, y in field_space])
+        right_coord = max([x + 1 + (y - min_y) % 2 * 0.5 for x, y in field_space])
+
+        print (left_coord, right_coord, width)
+        return (math.floor((width - (left_coord + right_coord)) / 2), -min_y)
+
 
 class Position:
     unit = None
@@ -207,16 +223,16 @@ if __name__ == "__main__":
     units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
 
     unit_index = args.unit
+    unit = units[unit_index]
 
-
-    board.create_unit(units[unit_index])
-    pos = Position(units[unit_index])
-    pos.pivot = (5, 11)
+    board.create_unit(unit)
+    pos = Position(unit)
+    pos.pivot = (5, 5)
     pos.rotation = 1
 
+    res = unit.calc_starting_position(board.width)
+    print unit.cells
+    print res
+    pos.pivot = res
     pos.draw(board)
-
-    print units[unit_index].symmetry_class
-
     board.draw_field()
-    board.fix_unit()
