@@ -30,7 +30,6 @@ class Unit:
 
     @staticmethod
     def rotate(cell, rotation):
-        rotation += 600
         rotation %= 6
         answer = cell
         for i in range(rotation):
@@ -124,6 +123,9 @@ class Board:
 
         self.clear_unit()
 
+    def in_board(self, cell):
+        return 0 <= cell[0] < self.width and 0 <= cell[1] < self.height
+
     def clear_unit(self):
         self.unit = numpy.zeros((self.width, self.height), int)
         self.pivot = (-1, -1)
@@ -162,7 +164,6 @@ class Board:
 
         return self.syms[is_unit][is_pivot]
 
-
     syms = (('.', 'o'), ('*', '@'))
 
 
@@ -176,6 +177,7 @@ class Game:
         self.board = board
         self.unit_generator = unit_generator
         self.cur_score = 0
+        self.prev = []
 
         self.cur_unit = None
         self.try_get_next_unit()
@@ -211,9 +213,17 @@ class Game:
     def try_ccw(self):
         return self.try_pos(self.cur_position.ccw())
 
-    def try_pos(self, new_position):
-        self.cur_position = new_position
-        return Game.MoveResult.Continue
+    def spawn(self):
+        self.prev = []
+        pass
+
+    def try_pos(self, pos):
+        for x, y in pos.field_space():
+            if not board.in_board((x, y)) or self.board.field[x, y]:
+                return MoveResult.Lock
+
+        self.cur_position = pos
+        return MoveResult.Continue
 
     def undo(self):
         raise NotImplemented
@@ -278,10 +288,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    input_data = json.load(open(args.file))
+    config = json.load(open(args.file))
 
-    board = Board(input_data['width'], input_data['height'], input_data['filled'])
-    units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
+    game = GameGenerator(config).next()
+
+    board = Board(config['width'], config['height'], config['filled'])
+    units = map(lambda x: Unit(x['members'], x['pivot']), config['units'])
     for u in units:
         u.calc_starting_position(board.width)
 
