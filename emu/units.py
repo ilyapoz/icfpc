@@ -14,7 +14,7 @@ for u in units:
     u_ext = u.extent()
     extent = (max(extent[0], u_ext[0]), max(extent[1], u_ext[1]))
 
-board = Board(extent[0] * 3, extent[1] * 2, [])
+board = Board(extent[0] * 2, extent[1] * 2, [])
 
 for u in units:
     u.calc_starting_position(board.width)
@@ -25,7 +25,5 @@ for i in range(len(units)):
     pos.rotation = 0
 
     pos.pivot = units[i].starting_position
-    board.clear_unit()
-    pos.draw(board)
-    board.draw_field()
+    board.draw_field(pos)
     print ''

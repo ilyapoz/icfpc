@@ -82,12 +82,6 @@ class Position:
             shifted = (rot[0] + shift[0], rot[1] + shift[1])
             yield Unit.unit_to_field_space(shifted)
 
-    def draw(self, board):
-        board.clear_unit()
-        board.pivot = self.pivot
-        for x, y in self.field_space():
-            board.unit[x, y] = True
-
     def west(self):
         return Position(self.unit, (self.pivot[0]-1, self.pivot[1]), self.rotation)
 
@@ -117,7 +111,6 @@ class Position:
 
 class Board:
     def __init__(self, width, height, filled):
-        self.filled = filled
         self.width = width
         self.height = height
 
@@ -125,14 +118,8 @@ class Board:
         for cell in filled:
             self.field[cell['x'], cell['y']] = 1
 
-        self.clear_unit()
-
     def in_board(self, cell):
         return 0 <= cell[0] < self.width and 0 <= cell[1] < self.height
-
-    def clear_unit(self):
-        self.unit = numpy.zeros((self.width, self.height), int)
-        self.pivot = (-1, -1)
 
     def filled_lines(self):
         return numpy.nonzero(numpy.sum(self.field, 0) == self.width)[0].tolist()
@@ -145,12 +132,9 @@ class Board:
         for x in range(0, self.width):
             self.field[x, 0] = 0
 
-    def fix_unit(self):
-        self.field = self.field + self.unit
-        pass
-
-    def create_unit(self, unit):
-        self.clear_unit()
+    def fix_unit(self, pos):
+        for x, y in pos.field_space():
+            self.field[x, y] = 1
 
     def get_field_str_impl(self, expr, ext=0):
         result = ''
@@ -164,18 +148,18 @@ class Board:
             result += '\n' * (ext + 1)
         return result
 
-    def get_field_str(self, ext=0):
-        return self.get_field_str_impl(lambda x, y: self.sym(x, y), ext)
+    def get_field_str(self, pos, ext=0):
+        return self.get_field_str_impl(lambda x, y: self.sym(x, y, pos), ext)
 
-    def draw_field(self, ext=0):
-        print self.get_field_str(ext)
+    def draw_field(self, pos, ext=0):
+        print self.get_field_str(pos, ext)
 
-    def sym(self, x, y):
+    def sym(self, x, y, pos):
         if self.field[x, y]:
             return '#'
 
-        is_pivot = (x, y) == self.pivot
-        is_unit = self.unit[x, y]
+        is_pivot = (x, y) == pos.pivot if pos else False
+        is_unit = (x, y) in pos.field_space() if pos else False
 
         return self.syms[is_unit][is_pivot]
 
@@ -331,5 +315,5 @@ if __name__ == "__main__":
     board.clear_line(11)
     board.clear_line(13)
     board.clear_line(13)
-    pos.draw(board)
-    board.draw_field()
+    board.draw_field(pos)
+    logging.debug(board.filled_lines())
