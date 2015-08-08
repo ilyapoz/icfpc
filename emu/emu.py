@@ -124,9 +124,9 @@ class Game:
         Lock = 1
         Continue = 2
 
-    def __init__(self, board, units):
+    def __init__(self, board, unit_generator):
         self.board = board
-        self.units = units
+        self.unit_generator = unit_generator
 
     def try_sw(self):
         """
@@ -148,6 +148,51 @@ class Game:
 
     def redo(self):
         pass
+
+
+class UnitGenerator:
+    def __init__(self, units, source_seed, source_length):
+        self.current_seed = source_seed
+        self.emitted_unit_count = 0
+        self.source_length = source_length
+        self.units = units
+
+    def __iter__(self):
+        return self
+
+    @staticmethod
+    def get_bits(number, min_index, max_index):
+        number = number >> min_index << min_index
+        number = ((number << (32 - max_index)) & 0xFFFFFFFF) >> (32 - max_index)
+        return number
+
+    def next(self):
+        if self.emitted_unit_count == self.source_length:
+            raise StopIteration
+        self.emitted_unit_count += 1
+        random_number = UnitGenerator.get_bits(self.current_seed, 16, 31) >> 16
+        index = random_number % len(self.units)
+        self.current_seed = (self.current_seed * 1103515245 + 12345) % (2 ** 32)
+        return self.units[index]
+
+
+class GameGenerator:
+    def __init__(self, board_generator, units, source_seeds, source_length):
+        self.current_seed_index = -1
+        self.source_seeds = source_seeds
+        self.source_length = source_length
+        self.units = units
+        self.board_generator = board_generator
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        self.current_seed_index += 1
+        if self.current_seed_index == len(self.source_seeds):
+            raise StopIteration
+        return Game(self.board_generator(), UnitGenerator(self.units, self.source_seeds[self.current_seed_index], self.source_length))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
