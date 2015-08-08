@@ -61,10 +61,10 @@ class Unit:
         field_space = list(pos.field_space())
         field_width = width + 0.5
 
-        left_coord = min([x + (y - min_y) % 2 * 0.5 for x, y in field_space])
-        right_coord = max([x + 1 + (y - min_y) % 2 * 0.5 for x, y in field_space])
+        left_coord = min([x + y % 2 * 0.5 for x, y in field_space])
+        right_coord = max([x + 1 + y % 2 * 0.5 for x, y in field_space])
 
-        self.starting_position = (math.floor((width - (left_coord + right_coord)) / 2), -min_y)
+        self.starting_position = (math.floor((field_width - (left_coord + right_coord)) / 2), -min_y)
 
 
 class Position:
@@ -134,10 +134,10 @@ class Board:
         result = ''
         for y in xrange(0, self.height):
             if y % 2:
-                result += ' ' * ext
+                result += ' ' * (ext + 1)
 
             for x in xrange(0, self.width):
-                result += expr(x, y) + ' ' * ext
+                result += expr(x, y) + ' ' * (ext + 1)
 
             result += '\n' * (ext + 1)
         return result
