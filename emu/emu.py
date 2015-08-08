@@ -81,6 +81,7 @@ class Position:
             yield Unit.unit_to_field_space(shifted)
 
     def draw(self, board):
+        board.clear_unit()
         board.pivot = self.pivot
         for x, y in self.field_space():
             board.unit[x, y] = True
@@ -176,32 +177,48 @@ class Game:
         self.unit_generator = unit_generator
         self.cur_score = 0
 
+        self.cur_unit = None
+        self.try_get_next_unit()
+
+    def try_get_next_unit(self):
+        try:
+            self.cur_unit = self.unit_generator.next()
+            self.cur_position = Position(self.cur_unit, self.cur_unit.starting_position, 0)
+        except StopIteration:
+            self.cur_unit = None
+
     def ended(self):
-        return False
+        return self.cur_unit is None
 
     def score(self):
         return self.cur_score
 
-    def try_sw(self):
-        """
-            returns MoveResult
-        """
-        pass
+    def try_west(self):
+        self.try_pos(self.cur_position.west())
 
-    def try_se(self):
-        pass
+    def try_east(self):
+        self.try_pos(self.cur_position.east())
+
+    def try_south_west(self):
+        self.try_pos(self.cur_position.south_west())
+
+    def try_south_east(self):
+        self.try_pos(self.cur_position.south_east())
 
     def try_cw(self):
-        pass
+        self.try_pos(self.cur_position.cw())
 
     def try_ccw(self):
-        pass
+        self.try_pos(self.cur_position.ccw())
+
+    def try_pos(self, new_position):
+        return True
 
     def undo(self):
-        pass
+        raise NotImplemented
 
     def redo(self):
-        pass
+        raise NotImplemented
 
 
 class UnitGenerator:
@@ -232,12 +249,15 @@ class UnitGenerator:
 
 
 class GameGenerator:
-    def __init__(self, board_generator, units, source_seeds, source_length):
+    def __init__(self, config):
         self.current_seed_index = -1
-        self.source_seeds = source_seeds
-        self.source_length = source_length
-        self.units = units
-        self.board_generator = board_generator
+        self.source_seeds = config['sourceSeeds']
+        self.source_length = config['sourceLength']
+        self.config = config
+
+        self.units = [Unit(unit_cfg['members'], unit_cfg['pivot']) for unit_cfg in config['units']]
+        for unit in self.units:
+            unit.calc_starting_position(config['width'])
 
     def __iter__(self):
         return self
@@ -246,7 +266,8 @@ class GameGenerator:
         self.current_seed_index += 1
         if self.current_seed_index == len(self.source_seeds):
             raise StopIteration
-        return Game(self.board_generator(), UnitGenerator(self.units, self.source_seeds[self.current_seed_index], self.source_length))
+        return Game(Board(self.config['width'], self.config['height'], self.config['filled']),
+                    UnitGenerator(self.units, self.source_seeds[self.current_seed_index], self.source_length))
 
 
 if __name__ == "__main__":

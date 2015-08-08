@@ -9,12 +9,17 @@ def play(game, screen):
     while not game.ended() and not stop_game:
         screen.addstr(1, 5, 'Score: %d' % game.score())
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, S to go south west, D to go south east,')
-        screen.addstr(4, 5, '          Z to cancel move, Q to quit.')
+        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Q to quit.')
 
+        game.cur_position.draw(game.board)
         screen.addstr(6, 0, game.board.get_field_str(ext=1))
         screen.refresh()
 
         key = screen.getch()
+        if key == 'w' or key == 'W':
+            game.try_west()
+        elif key == 'e' or key == 'E':
+            game.try_east()
 
         screen.clear()
         screen.addstr(5, 5, 'You have entered %d' % key)
@@ -23,6 +28,7 @@ def play(game, screen):
             stop_game = True
 
     return ''
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -37,9 +43,8 @@ def main():
         screen = curses.initscr()
         curses.cbreak()
 
-        board_generator = lambda: emu.Board(config['width'], config['height'], config['filled'])
         results = []
-        for game in emu.GameGenerator(board_generator, config['units'], config['sourceSeeds'], config['sourceLength']):
+        for game in emu.GameGenerator(config):
             moves = play(game, screen)
             results.append({
                 'problemId': config['id'],
