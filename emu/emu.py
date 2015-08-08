@@ -13,6 +13,7 @@ class Unit:
         self.cells = map(lambda x: Unit.field_to_unit_space((x['x'], x['y'])), cells)
 
         self.cells = map(lambda x: (x[0] - pivot[0], x[1] - pivot[1]), self.cells)
+        self.symmetry_class = self.calc_symmetry_class()
 
     @staticmethod
     def field_to_unit_space(coords):
@@ -28,13 +29,22 @@ class Unit:
 
     @staticmethod
     def rotate(cell, rotation):
-        rotation += 6
+        rotation += 600
         rotation %= 6
         answer = cell
         for i in range(rotation):
             answer = Unit.rot60(answer)
 
         return answer
+
+    def calc_symmetry_class(self):
+        pos = Position(self)
+        hash_0 = pos.hash()
+        pos.rotation = 1
+        while hash_0 != pos.hash():
+            pos.rotation += 1
+
+        return pos.rotation
 
 class Position:
     unit = None
@@ -138,6 +148,7 @@ class Game:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f')
+    parser.add_argument('--unit', type=int, default=0)
 
     args = parser.parse_args()
 
@@ -146,17 +157,17 @@ if __name__ == "__main__":
     board = Board(input_data['width'], input_data['height'], input_data['filled'])
     units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
 
-    print input_data['units'][0]
+    unit_index = args.unit
 
-    board.create_unit(units[0])
-    pos = Position(units[0])
+
+    board.create_unit(units[unit_index])
+    pos = Position(units[unit_index])
     pos.pivot = (5, 10)
     pos.rotation = 1
 
     pos.draw(board)
-    for i in range(12):
-        pos.rotation = i
-        print pos.hash()
+
+    print units[unit_index].symmetry_class
 
     board.draw()
     board.fix_unit()
