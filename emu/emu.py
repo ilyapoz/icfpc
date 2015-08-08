@@ -224,8 +224,6 @@ class Game:
 
         for x, y in pos.field_space():
             if not self.board.in_board((x, y)) or self.board.field[x, y]:
-                self.board.fix_unit()
-                self.try_get_next_unit()
                 return Game.MoveResult.Lock
 
         return Game.MoveResult.Continue
