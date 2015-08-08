@@ -7,6 +7,8 @@ import os
 
 class Unit:
     def __init__(self, cells, pivot):
+        pivot = field_to_piece_space([pivot['x'], pivot['y'])
+        
         self.cells = map(lambda x: [x['x'] - pivot['x'], x['y'] - pivot['y']], cells)
         self.rotation = 0
 
@@ -16,13 +18,27 @@ class Unit:
     def rotateccw(self):
         self.rotation = self.rotation + 1
 
-    @staticmethod
-    def rotate(cell, rotation):
+    def movesw(self):
+        pass
+
+    def movese(self):
         pass
 
     def draw(self, board, position):
         for x, y in self.cells:
-            pass
+            board
+
+    @staticmethod
+    def field_to_piece_space(coords):
+        return [coords[0], ]
+
+    @staticmethod
+    def piece_to_field_space(coords):
+        return []
+
+    @staticmethod
+    def rotate(cell, rotation):
+        pass
 
 class Board:
     def __init__(self, width, height, filled):
@@ -57,10 +73,28 @@ class Board:
             print
 
 class Game:
-    def __init__(self):
+    class MoveResult:
+        Loss = 0
+        Lock = 1
+        Continue = 2
+
+    def __init__(self, board, units):
+        self.board = board
+        self.units = units
+
+    def try_sw(self):
+        """ 
+            returns MoveResult
+        """
         pass
 
-    def move(self, input):
+    def try_se(self):
+        pass
+
+    def try_cw(self):
+        pass
+
+    def try_ccw(self):
         pass
 
     def undo(self):
