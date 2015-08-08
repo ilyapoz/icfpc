@@ -47,6 +47,12 @@ class Unit:
 
         return pos.rotation
 
+    def extent(self):
+        return (
+            max(x[0] for x in self.cells) - min(x[0] for x in self.cells),
+            max(x[1] for x in self.cells) - min(x[1] for x in self.cells)
+        )
+
     def calc_starting_position(self, width):
         min_y = min([x[1] for x in self.cells])
 
@@ -58,8 +64,7 @@ class Unit:
         left_coord = min([x + (y - min_y) % 2 * 0.5 for x, y in field_space])
         right_coord = max([x + 1 + (y - min_y) % 2 * 0.5 for x, y in field_space])
 
-        print (left_coord, right_coord, width)
-        return (math.floor((width - (left_coord + right_coord)) / 2), -min_y)
+        self.starting_position = (math.floor((width - (left_coord + right_coord)) / 2), -min_y)
 
 
 class Position:
@@ -221,18 +226,16 @@ if __name__ == "__main__":
 
     board = Board(input_data['width'], input_data['height'], input_data['filled'])
     units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
+    for u in units:
+        u.calc_starting_position(board.width)
 
     unit_index = args.unit
     unit = units[unit_index]
 
-    board.create_unit(unit)
     pos = Position(unit)
     pos.pivot = (5, 5)
-    pos.rotation = 1
+    pos.rotation = 0
 
-    res = unit.calc_starting_position(board.width)
-    print unit.cells
-    print res
-    pos.pivot = res
+    pos.pivot = unit.starting_position
     pos.draw(board)
     board.draw_field()
