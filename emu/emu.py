@@ -195,36 +195,32 @@ class Game:
     def score(self):
         return self.cur_score
 
-    def try_west(self):
-        return self.try_pos(self.cur_position.west())
+    def commit_pos(self, pos):
+        move_result = self.try_pos(pos)
+        assert move_result != Game.MoveResult.Loss
 
-    def try_east(self):
-        return self.try_pos(self.cur_position.east())
-
-    def try_south_west(self):
-        return self.try_pos(self.cur_position.south_west())
-
-    def try_south_east(self):
-        return self.try_pos(self.cur_position.south_east())
-
-    def try_cw(self):
-        return self.try_pos(self.cur_position.cw())
-
-    def try_ccw(self):
-        return self.try_pos(self.cur_position.ccw())
-
-    def spawn(self):
-        self.prev = []
+        if move_result == Game.MoveResult.Lock:
+            self.board.fix_unit()
+            self.prev = []
+            self.try_get_next_unit()
+        elif move_result == Game.MoveResult.Continue:
+            pos.draw(self.board)
+            self.cur_position = pos
+            self.prev.append((pos.pivot[0], pos.pivot[1], pos.rotation))
+        else:
+            assert False
 
     def try_pos(self, pos):
-        if (x, y, pos.rotation) in self.prev:
-            return Game.MoveResult.Loss
         for x, y in pos.field_space():
-            if not board.in_board((x, y)) or self.board.field[x, y]:
+            if (x, y, pos.rotation) in self.prev:
+                return Game.MoveResult.Loss
+
+        for x, y in pos.field_space():
+            if not self.board.in_board((x, y)) or self.board.field[x, y]:
+                self.board.fix_unit()
+                self.try_get_next_unit()
                 return Game.MoveResult.Lock
 
-        self.cur_position = pos
-        self.prev.append((x, y, pos.rotation))
         return Game.MoveResult.Continue
 
     def undo(self):

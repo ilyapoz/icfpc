@@ -6,36 +6,37 @@ import curses
 
 
 def play(game, screen):
-    stop_game = False
-    while not game.ended() and not stop_game:
+    while not game.ended():
         screen.addstr(1, 5, 'Score: %d' % game.score())
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, S to go south west, D to go south east,')
-        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Backspace to quit.')
+        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Ctr+C to quit.')
 
-        game.cur_position.draw(game.board)
-        screen.addstr(6, 0, game.board.get_field_str(ext=1))
+        screen.addstr(6, 0, game.board.get_field_str(ext=0))
         screen.refresh()
 
         key = screen.getch()
-        move_result = None
+
+        next_pos = None
         if key == ord('w') or key == ord('W'):
-            move_result = game.try_west()
+            next_pos = game.cur_position.west()
         elif key == ord('e') or key == ord('E'):
-            move_result = game.try_east()
+            next_pos = game.cur_position.east()
         elif key == ord('s') or key == ord('S'):
-            move_result = game.try_south_west()
+            next_pos = game.cur_position.south_west()
         elif key == ord('d') or key == ord('D'):
-            move_result = game.try_south_east()
+            next_pos = game.cur_position.south_east()
         elif key == ord('q') or key == ord('Q'):
-            move_result = game.try_ccw()
+            next_pos = game.cur_position.ccw()
         elif key == ord('r') or key == ord('R'):
-            move_result = game.try_cw()
+            next_pos = game.cur_position.cw()
+
+        if next_pos != None:
+            move_result = game.try_pos(next_pos)
+            if move_result != emu.Game.MoveResult.Loss:
+                game.commit_pos(next_pos)
 
         screen.clear()
         screen.addstr(5, 5, 'You have entered %d' % key)
-
-        if key == curses.KEY_BACKSPACE:
-            stop_game = True
 
     return ''
 
