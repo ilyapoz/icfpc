@@ -180,14 +180,13 @@ class Game:
         self.board = board
         self.unit_generator = unit_generator
         self.cur_score = 0
-        self.prev = []
 
         self.cur_unit = None
         self.try_get_next_unit()
 
     def try_get_next_unit(self):
         try:
-            self.prev = []
+            self.prev = set()
             self.cur_unit = self.unit_generator.next()
             pos = Position(self.cur_unit, self.cur_unit.starting_position, 0)
             if self.try_pos(pos):
@@ -213,14 +212,13 @@ class Game:
         elif move_result == Game.MoveResult.Continue:
             pos.draw(self.board)
             self.cur_position = pos
-            self.prev.append((pos.pivot[0], pos.pivot[1], pos.rotation))
+            self.prev.add((pos.pivot[0], pos.pivot[1], pos.rotation))
         else:
             assert False
 
     def try_pos(self, pos):
-        for x, y in pos.field_space():
-            if (x, y, pos.rotation) in self.prev:
-                return Game.MoveResult.Loss
+        if (pos.pivot[0], pos.pivot[1], pos.rotation) in self.prev:
+            return Game.MoveResult.Loss
 
         for x, y in pos.field_space():
             if not self.board.in_board((x, y)) or self.board.field[x, y]:
