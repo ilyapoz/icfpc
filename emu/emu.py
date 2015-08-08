@@ -8,44 +8,47 @@ import unittest
 
 class Unit:
     def __init__(self, cells, pivot):
-        pivot = Unit.field_to_piece_space((pivot['x'], pivot['y']))
+        pivot = Unit.field_to_unit_space((pivot['x'], pivot['y']))
 
-        self.cells = map(lambda x: [x['x'] - pivot[0], x['y'] - pivot[0]], cells)
-        self.rotation = 0
+        self.cells = map(lambda x: Unit.field_to_unit_space((x['x'], x['y'])), cells)
 
-    def cw(self):
-        self.rotation = self.rotation - 1
-
-    def ccw(self):
-        self.rotation = self.rotation + 1
-
-    def sw(self):
-        pass
-
-    def se(self):
-        pass
-
-    def w(self):
-        pass
-
-    def e(self):
-        pass
-
-    def draw(self, board, position):
-        for x, y in self.cells:
-            board
+        self.cells = map(lambda x: (x[0] - pivot[0], x[1] - pivot[1]), self.cells)
 
     @staticmethod
-    def field_to_piece_space(coords):
+    def field_to_unit_space(coords):
         return (coords[0] - coords[1] / 2, coords[1])
 
     @staticmethod
-    def piece_to_field_space(coords):
+    def unit_to_field_space(coords):
         return (coords[0] + coords[1] / 2, coords[1])
 
     @staticmethod
+    def rot60(cell):
+        return (-cell[1], cell[0] + cell[1])
+
+    @staticmethod
     def rotate(cell, rotation):
-        pass
+        rotation += 6
+        rotation %= 6
+        answer = cell
+        for i in range(rotation):
+            answer = Unit.rot60(answer)
+
+        return answer
+
+class Position:
+    pivot = (0, 0)
+    rotation = 0 # ccw rotation
+
+    def draw(self, unit, board):
+        board.pivot = self.pivot
+        for cell in unit.cells:
+            rot = Unit.rotate(cell, self.rotation)
+            shift = Unit.field_to_unit_space(self.pivot)
+            shifted = (rot[0] + shift[0], rot[1] + shift[1])
+            field = Unit.unit_to_field_space(shifted)
+            board.unit[field[0], field[1]] = True
+
 
 class Board:
     def __init__(self, width, height, filled):
@@ -61,6 +64,7 @@ class Board:
 
     def clear_unit(self):
         self.unit = numpy.zeros((self.width, self.height), int)
+        self.pivot = (-1, -1)
 
     def fix_unit(self):
         self.field = self.field + self.unit
@@ -69,15 +73,25 @@ class Board:
     def create_unit(self, unit):
         pass
 
+    def sym(self, x, y):
+        if self.field[x, y]:
+            return '#'
+
+        is_pivot = (x, y) == self.pivot
+        is_unit = self.unit[x, y]
+
+        return self.syms[is_unit][is_pivot]
+
     def draw(self):
         for y in xrange(0, self.height):
             if y % 2:
                 print '',
 
             for x in xrange(0, self.width):
-                print 'o' if self.field[x, y] else '*' if self.unit[x, y] else '.',
-
+                print self.sym(x, y),
             print
+
+    syms = (('.', 'o'), ('*', '@'))
 
 class Game:
     class MoveResult:
@@ -110,19 +124,9 @@ class Game:
     def redo(self):
         pass
 
-class TestUnit(unittest.TestCase):
-    def test_sanity(self):
-        for x in range(-100, 100):
-            for y in range(-100, 100):
-                to_piece = Unit.field_to_piece_space((x, y))
-                to_field = Unit.piece_to_field_space(to_piece)
-
-                self.assertEqual(to_field, (x, y))
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f')
-    parser.add_argument('--test', '-t')
 
     args = parser.parse_args()
 
@@ -131,13 +135,13 @@ if __name__ == "__main__":
     board = Board(input_data['width'], input_data['height'], input_data['filled'])
     units = map(lambda x: Unit(x['members'], x['pivot']), input_data['units'])
 
-    if args.test:
-        unittest.main()
-        sys.exit(0)
+    print input_data['units'][0]
 
     board.create_unit(units[0])
+    pos = Position()
+    pos.pivot = (5, 10)
+    pos.rotation = -1
+
+    pos.draw(units[0], board)
     board.draw()
     board.fix_unit()
-
-    print Unit.field_to_piece_space((0, 2))
-    print Unit.piece_to_field_space((0, 2))
