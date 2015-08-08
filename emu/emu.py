@@ -212,21 +212,26 @@ class Game:
         return points + line_bonus
 
     class State:
-        def __init__(self, unit_pos, board, score, visited_positions):
+        def __init__(self, unit_index, unit_pos, board, score, visited_positions):
+            self.unit_index = unit_index
             self.unit_pos = unit_pos
             self.board = board
             self.score = score
             self.visited_positions = visited_positions
 
     def __init__(self, board, unit_generator):
+        self.unit_generator = unit_generator
         self.units = list(unit_generator)
         self.game_ended = False
         self.state_stack = []
         self.switch_to_next_unit(board, 0)
 
     def switch_to_next_unit(self, board, score):
-        cur_unit_index = -1 if len(self.state_stack) == 0 else self.units.index(self.cur_unit_pos().unit)
+        cur_unit_index = -1 if len(self.state_stack) == 0 else self.state_stack[-1].unit_index
         next_unit_index = cur_unit_index + 1
+
+        logging.debug('switch_to_next_unit, cur_index=%d, next_index=%d, unit_count=%d' % (cur_unit_index, next_unit_index, len(self.units)))
+
         if next_unit_index == len(self.units):
             self.game_ended = True
             logging.debug('Game ended because no more pieces are available' % next_unit_index)
@@ -234,8 +239,8 @@ class Game:
 
         next_unit = self.units[next_unit_index]
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
-        if next_unit_index == 0 or self.try_pos(next_unit_pos) == Game.MoveResult.Continue:
-            self.state_stack.append(Game.State(next_unit_pos, board, score, PersistentStack()))
+        self.state_stack.append(Game.State(next_unit_index, next_unit_pos, board, score, PersistentStack()))
+        if next_unit_index == 0 or self.try_pos_on_board(next_unit_pos, board) == Game.MoveResult.Continue:
             logging.debug('Piece %d started' % next_unit_index)
         else:
             self.game_ended = True
@@ -248,38 +253,48 @@ class Game:
         return self.state_stack[-1].score
 
     def cur_unit_pos(self):
-        return None if self.game_ended else self.state_stack[-1].unit_pos
+        return None if self.ended() else self.state_stack[-1].unit_pos
 
     def board(self):
         return self.state_stack[-1].board
 
     def commit_pos(self, pos):
+        assert not self.ended()
+
         move_result = self.try_pos(pos)
         assert move_result != Game.MoveResult.Loss
 
         if move_result == Game.MoveResult.Lock:
-            (new_board, lines_cleared) = self.state_stack[-1].board.fix_unit_and_clear(self.cur_unit_pos())
+            logging.debug('Piece locked')
+            (new_board, lines_cleared) = self.board().fix_unit_and_clear(self.cur_unit_pos())
             self.switch_to_next_unit(new_board, 0)  # TODO: compute new score
         elif move_result == Game.MoveResult.Continue:
             self.state_stack.append(Game.State(
+                self.state_stack[-1].unit_index,
                 pos,
                 self.state_stack[-1].board,
                 self.state_stack[-1].score,
                 self.state_stack[-1].visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation))))
         else:
+            logging.debug(move_result)
             assert False
 
     def try_pos(self, pos):
+        return self.try_pos_on_board(pos, self.board())
+
+    def try_pos_on_board(self, pos, board):
         if (pos.pivot[0], pos.pivot[1], pos.rotation) in self.state_stack[-1].visited_positions.items():
             return Game.MoveResult.Loss
 
         for x, y in pos.field_space():
-            if not self.board().in_board((x, y)) or self.board().field[x, y]:
+            if not board.in_board((x, y)) or board.field[x, y]:
                 return Game.MoveResult.Lock
 
         return Game.MoveResult.Continue
 
     def undo(self):
+        if self.game_ended:
+            self.game_ended = False
         if len(self.state_stack) > 1:
             self.state_stack.pop()
 

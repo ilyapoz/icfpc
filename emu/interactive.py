@@ -5,12 +5,14 @@ import json
 import curses
 
 
-def play(game, screen):
+def play(game, screen, game_index, game_count):
     last_res = ''
-    while not game.ended():
-        screen.addstr(1, 5, 'Score: %d' % game.score())
+    can_quit = False
+    while not can_quit:
+        screen.addstr(1, 5, 'Game: %d out of %d' % (game_index + 1, game_count))
+        screen.addstr(2, 5, 'Score: %d' % game.score())
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
-        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, Ctr+C to quit.')
+        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
         screen.addstr(5, 5, '          %s' % str(last_res))
 
         screen.addstr(7, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
@@ -19,18 +21,22 @@ def play(game, screen):
         key = screen.getch()
 
         next_pos = None
-        if key in map(ord, ['w', 'W']):
-            next_pos = game.cur_unit_pos().west()
-        elif key in map(ord, ['e', 'E']):
-            next_pos = game.cur_unit_pos().east()
-        elif key in map(ord, ['a', 'A']):
-            next_pos = game.cur_unit_pos().south_west()
-        elif key in map(ord, ['d', 'D']):
-            next_pos = game.cur_unit_pos().south_east()
-        elif key in map(ord, ['q', 'Q']):
-            next_pos = game.cur_unit_pos().ccw()
-        elif key in map(ord, ['r', 'R']):
-            next_pos = game.cur_unit_pos().cw()
+        if not game.ended():
+            if key in map(ord, ['w', 'W']):
+                next_pos = game.cur_unit_pos().west()
+            elif key in map(ord, ['e', 'E']):
+                next_pos = game.cur_unit_pos().east()
+            elif key in map(ord, ['a', 'A']):
+                next_pos = game.cur_unit_pos().south_west()
+            elif key in map(ord, ['d', 'D']):
+                next_pos = game.cur_unit_pos().south_east()
+            elif key in map(ord, ['q', 'Q']):
+                next_pos = game.cur_unit_pos().ccw()
+            elif key in map(ord, ['r', 'R']):
+                next_pos = game.cur_unit_pos().cw()
+
+        if key in map(ord, ['0']):
+            can_quit = True
         elif key in map(ord, ['z', 'Z']):
             last_res = 'Undo'
             game.undo()
@@ -40,6 +46,8 @@ def play(game, screen):
             last_res = move_result
             if move_result != emu.Game.MoveResult.Loss:
                 game.commit_pos(next_pos)
+                if game.ended():
+                    last_res += ' (Game over)'
 
         screen.clear()
 
@@ -60,8 +68,10 @@ def main():
         curses.cbreak()
 
         results = []
+        game_index = 0
         for game in emu.GameGenerator(config):
-            moves = play(game, screen)
+            moves = play(game, screen, game_index, len(config['sourceSeeds']))
+            game_index += 1
             results.append({
                 'problemId': config['id'],
                 'seed': game.unit_generator.source_seed,
