@@ -6,6 +6,9 @@ import sys
 import os
 import unittest
 import math
+import logging
+
+logging.basicConfig(filename='emu.log', level=logging.DEBUG)
 
 class Unit:
     def __init__(self, cells, pivot):
@@ -102,10 +105,11 @@ class Position:
         return Position(self.unit, Unit.unit_to_field_space(unit), self.rotation)
 
     def cw(self):
-        return Position(self.unit, self.pivot, self.rotation + 1 % self.unit.symmetry_class)
+        return Position(self.unit, self.pivot, (self.rotation + 1) % self.unit.symmetry_class)
 
     def ccw(self):
-        return Position(self.unit, self.pivot, self.rotation - 1 % self.unit.symmetry_class)
+        logging.debug('%d', self.rotation)
+        return Position(self.unit, self.pivot, (self.rotation - 1) % self.unit.symmetry_class)
 
     def hash(self):
         return hash(str(sorted(list(self.field_space()))))
@@ -129,6 +133,17 @@ class Board:
     def clear_unit(self):
         self.unit = numpy.zeros((self.width, self.height), int)
         self.pivot = (-1, -1)
+
+    def filled_lines(self):
+        pass
+
+    def clear_line(self, y):
+        # Move one line down
+        for yy in range(y - 1, -1, -1):
+            for x in range(0, self.width):
+                self.field[x, yy + 1] = self.field[x, yy]
+        for x in range(0, self.width):
+            self.field[x, 0] = 0
 
     def fix_unit(self):
         self.field = self.field + self.unit
@@ -175,6 +190,12 @@ class Game:
 
     class GameOver(Exception):
         pass
+
+    @staticmethod
+    def compute_points(unit_size, lines_cleared, lines_cleared_prev):
+        points = unit_size + 100 * (1 + lines_cleared) * lines_cleared / 2
+        line_bonus = (lines_cleared_prev - 1) * points / 10 if lines_cleared_prev > 1 else 0
+        return points + line_bonus
 
     def __init__(self, board, unit_generator):
         self.board = board
@@ -307,5 +328,8 @@ if __name__ == "__main__":
 
     pos = pos.south_west()
 
+    board.clear_line(11)
+    board.clear_line(13)
+    board.clear_line(13)
     pos.draw(board)
     board.draw_field()
