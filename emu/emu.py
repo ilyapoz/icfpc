@@ -93,14 +93,18 @@ class Board:
     def create_unit(self, unit):
         pass
 
-    def draw(self):
+    def draw(self, expr, ext=0):
         for y in xrange(0, self.height):
             if y % 2:
-                print '',
+                print ' ' * ext,
 
             for x in xrange(0, self.width):
-                print self.sym(x, y),
-            print
+                print expr(x, y) + ' ' * ext,
+
+            print '\n' * ext
+
+    def draw_field(self, ext=0):
+        self.draw(lambda x, y: self.sym(x, y), ext)
 
     def sym(self, x, y):
         if self.field[x, y]:
@@ -162,12 +166,12 @@ if __name__ == "__main__":
 
     board.create_unit(units[unit_index])
     pos = Position(units[unit_index])
-    pos.pivot = (5, 10)
+    pos.pivot = (5, 11)
     pos.rotation = 1
 
     pos.draw(board)
 
     print units[unit_index].symmetry_class
 
-    board.draw()
+    board.draw_field()
     board.fix_unit()
