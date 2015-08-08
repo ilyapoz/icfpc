@@ -93,18 +93,23 @@ class Board:
     def create_unit(self, unit):
         pass
 
-    def draw(self, expr, ext=0):
+    def get_field_str_impl(self, expr, ext=0):
+        result = ''
         for y in xrange(0, self.height):
             if y % 2:
-                print ' ' * ext,
+                result += ' ' * ext
 
             for x in xrange(0, self.width):
-                print expr(x, y) + ' ' * ext,
+                result += expr(x, y) + ' ' * ext
 
-            print '\n' * ext
+            result += '\n' * (ext + 1)
+        return result
+
+    def get_field_str(self, ext=0):
+        return self.get_field_str_impl(lambda x, y: self.sym(x, y), ext)
 
     def draw_field(self, ext=0):
-        self.draw(lambda x, y: self.sym(x, y), ext)
+        print self.get_field_str(ext)
 
     def sym(self, x, y):
         if self.field[x, y]:
@@ -127,6 +132,13 @@ class Game:
     def __init__(self, board, unit_generator):
         self.board = board
         self.unit_generator = unit_generator
+        self.cur_score = 0
+
+    def ended(self):
+        return False
+
+    def score(self):
+        return self.cur_score
 
     def try_sw(self):
         """
@@ -152,6 +164,7 @@ class Game:
 
 class UnitGenerator:
     def __init__(self, units, source_seed, source_length):
+        self.source_seed = source_seed
         self.current_seed = source_seed
         self.emitted_unit_count = 0
         self.source_length = source_length
