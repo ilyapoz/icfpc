@@ -37,17 +37,27 @@ class Unit:
         return answer
 
 class Position:
+    unit = None
     pivot = (0, 0)
-    rotation = 0 # ccw rotation
+    rotation = 0 # cw rotation
 
-    def draw(self, unit, board):
-        board.pivot = self.pivot
-        for cell in unit.cells:
+    def __init__(self, unit):
+        self.unit = unit
+
+    def field_space(self):
+        for cell in self.unit.cells:
             rot = Unit.rotate(cell, self.rotation)
             shift = Unit.field_to_unit_space(self.pivot)
             shifted = (rot[0] + shift[0], rot[1] + shift[1])
-            field = Unit.unit_to_field_space(shifted)
-            board.unit[field[0], field[1]] = True
+            yield Unit.unit_to_field_space(shifted)
+
+    def draw(self, board):
+        board.pivot = self.pivot
+        for x, y in self.field_space():
+            board.unit[x, y] = True
+
+    def hash(self):
+        return hash(str(sorted(list(self.field_space()))))
 
 
 class Board:
@@ -73,6 +83,15 @@ class Board:
     def create_unit(self, unit):
         pass
 
+    def draw(self):
+        for y in xrange(0, self.height):
+            if y % 2:
+                print '',
+
+            for x in xrange(0, self.width):
+                print self.sym(x, y),
+            print
+
     def sym(self, x, y):
         if self.field[x, y]:
             return '#'
@@ -82,14 +101,6 @@ class Board:
 
         return self.syms[is_unit][is_pivot]
 
-    def draw(self):
-        for y in xrange(0, self.height):
-            if y % 2:
-                print '',
-
-            for x in xrange(0, self.width):
-                print self.sym(x, y),
-            print
 
     syms = (('.', 'o'), ('*', '@'))
 
@@ -138,10 +149,14 @@ if __name__ == "__main__":
     print input_data['units'][0]
 
     board.create_unit(units[0])
-    pos = Position()
+    pos = Position(units[0])
     pos.pivot = (5, 10)
-    pos.rotation = -1
+    pos.rotation = 1
 
-    pos.draw(units[0], board)
+    pos.draw(board)
+    for i in range(12):
+        pos.rotation = i
+        print pos.hash()
+
     board.draw()
     board.fix_unit()
