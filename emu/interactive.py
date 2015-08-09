@@ -88,7 +88,7 @@ def main():
                 'seed': game.unit_generator.source_seed,
                 'tag': 'interactive',
                 'solution': moves})
-        json.dump(results, open(args.output_file, 'w'))
+        json.dump(results, open(args.output_file, 'w'), indent=4)
 
     finally:
         curses.endwin()
