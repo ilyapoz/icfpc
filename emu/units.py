@@ -14,7 +14,7 @@ for u in units:
     u_ext = u.extent()
     extent = (max(extent[0], u_ext[0]), max(extent[1], u_ext[1]))
 
-board = Board(extent[0] * 2, extent[1] * 2, [])
+board = Board(extent[0] + 4, extent[1] + 4, [])
 
 for u in units:
     u.calc_starting_position(board.width)
