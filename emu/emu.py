@@ -344,16 +344,20 @@ class Game:
             if len(self.state_stack) > 1:
                 self.state_stack.pop()
 
-    def try_phrose(self, phrase, commit):
+    def try_phrase(self, phrase, commit, allow_locks=True):
         phrase = phrase.tolower()
         committed = 0
         try:
-            for c in phrase:
-                if self.cur_unit_pos() is None:
+            for i, c in enumerate(phrase):
+                if self.ended():
                     raise StopIteration
                 next_pos = self.cur_unit_pos().apply_char(c)
 
-                if self.try_pos(next_pos) == Game.MoveResult.Loss:
+                res = self.try_pos(next_pos)
+                if res == Game.MoveResult.Loss:
+                    raise StopIteration
+
+                if not allow_locks and res == Game.MoveResult.Lock and i != len(phrase) - 1:
                     raise StopIteration
 
                 self.commit_pos(next_pos, c)
