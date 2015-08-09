@@ -20,7 +20,7 @@ for u in units:
     u.calc_starting_position(board.width)
 
 for i in range(len(units)):
-    print 'Unit %d (symmetry %d)' % (i, units[i].symmetry_class)
+    print 'Unit %d (perimeter %d, symmetry %d)' % (i, units[i].perimeter, units[i].symmetry_class)
     pos = Position(units[i])
     pos.rotation = 0
 
