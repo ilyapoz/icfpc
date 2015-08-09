@@ -101,7 +101,7 @@ def main():
                 'problemId': config['id'],
                 'seed': game.unit_generator.source_seed,
                 'solution': moves})
-        json.dump(results, open(args.output_file, 'w'))
+        json.dump(results, open(args.output_file, 'w'), indent=4)
 
     finally:
         curses.endwin()
