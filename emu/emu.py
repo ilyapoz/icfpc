@@ -262,7 +262,14 @@ class Game:
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
         next_phrases = {} if len(self.state_stack) == 0 else dict(self.current_state().casted_phrases)
 
-        self.state_stack.append(Game.State(next_unit_index, next_unit_pos, board, score, PersistentStack(), lines_cleared, next_phrases))
+        self.state_stack.append(Game.State(
+            next_unit_index,
+            next_unit_pos,
+            board,
+            score,
+            PersistentStack(tail=(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)),
+            lines_cleared,
+            next_phrases))
         if next_unit_index == 0 or self.try_pos_on_board(next_unit_pos, board) == Game.MoveResult.Continue:
             logging.debug('Piece %d started' % next_unit_index)
         else:
