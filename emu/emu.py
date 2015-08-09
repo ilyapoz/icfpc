@@ -260,6 +260,10 @@ class Game:
         if next_unit_index == len(self.units):
             self.game_ended = True
             logging.debug('Game ended because no more pieces are available')
+
+            # Add a state even if there are no more pieces (so that the board drawing will be updated)
+            self.state_stack.append(Game.State(cur_unit_index, None, board, score, None, None, None, move_chr))
+
             return
 
         next_unit = self.units[next_unit_index]
@@ -272,7 +276,7 @@ class Game:
             self.game_ended = True
             logging.debug('Game ended because piece %d cannot be placed' % next_unit_index)
 
-        # Add piece even if it cannot be added (so that the board drawing will be updated)
+        # Add a state even if a unit cannot be added (so that the board drawing will be updated)
         self.state_stack.append(Game.State(
             next_unit_index,
             next_unit_pos,
@@ -309,6 +313,7 @@ class Game:
             (new_board, lines_cleared) = self.board().fix_unit_and_clear(self.cur_unit_pos())
             logging.debug('Lines cleared: %d, prev lines cleared: %d' % (lines_cleared, self.current_state().lines_cleared_prev))
             move_score = Game.compute_points(len(self.cur_unit_pos().unit.cells), lines_cleared, self.current_state().lines_cleared_prev)
+            logging.debug('Prev score: %d, move score: %d' % (self.score(), move_score))
             self.switch_to_next_unit(new_board, self.score() + move_score, lines_cleared, move_chr)
         elif move_result == Game.MoveResult.Continue:
             self.state_stack.append(Game.State(
