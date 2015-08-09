@@ -8,6 +8,7 @@ import argparse
 import json
 import curses
 import logging
+import sys
 
 def norm(x, f = 10): return float(x) / (x + f)
 
@@ -163,3 +164,16 @@ def main():
 
 if __name__ == '__main__':
     main()
+    sys.exit()
+
+    import cProfile, pstats, StringIO
+    pr = cProfile.Profile()
+    pr.enable()
+
+    main()
+    pr.disable()
+    s = StringIO.StringIO()
+    sortby = 'tottime'
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    ps.print_stats()
+    print s.getvalue()
