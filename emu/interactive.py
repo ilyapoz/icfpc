@@ -22,19 +22,23 @@ def play(game, screen, game_index, game_count):
         key = screen.getch()
 
         next_pos = None
+        move_chr = None
         if not game.ended():
             if key in map(ord, ['w', 'W']):
-                next_pos = game.cur_unit_pos().west()
+                move_chr = 'p'
             elif key in map(ord, ['e', 'E']):
-                next_pos = game.cur_unit_pos().east()
+                move_chr = 'b'
             elif key in map(ord, ['a', 'A']):
-                next_pos = game.cur_unit_pos().south_west()
+                move_chr = 'g'
             elif key in map(ord, ['d', 'D']):
-                next_pos = game.cur_unit_pos().south_east()
+                move_chr = 'm'
             elif key in map(ord, ['q', 'Q']):
-                next_pos = game.cur_unit_pos().ccw()
+                move_chr = 's'
             elif key in map(ord, ['r', 'R']):
-                next_pos = game.cur_unit_pos().cw()
+                move_chr = 'q'
+
+            if move_chr is not None:
+                next_pos = game.cur_unit_pos().apply_char(move_chr)
 
         if key in map(ord, ['0']):
             can_quit = True
@@ -46,13 +50,13 @@ def play(game, screen, game_index, game_count):
             move_result = game.try_pos(next_pos)
             last_res = move_result
             if move_result != emu.Game.MoveResult.Loss:
-                game.commit_pos(next_pos)
+                game.commit_pos(next_pos, move_chr)
                 if game.ended():
                     last_res += ' (Game over)'
 
         screen.clear()
 
-    return ''
+    return game.current_move_seq()
 
 
 def main():

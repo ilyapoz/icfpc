@@ -231,7 +231,7 @@ class Game:
             return len(phrase) * 2 + 300
 
     class State:
-        def __init__(self, unit_index, unit_pos, board, score, visited_positions, lines_cleared_prev, casted_phrases):
+        def __init__(self, unit_index, unit_pos, board, score, visited_positions, lines_cleared_prev, casted_phrases, move_chr):
             self.unit_index = unit_index
             self.unit_pos = unit_pos
             self.board = board
@@ -239,15 +239,19 @@ class Game:
             self.visited_positions = visited_positions
             self.lines_cleared_prev = lines_cleared_prev
             self.casted_phrases = casted_phrases
+            self.move_chr = move_chr
 
     def __init__(self, board, unit_generator):
         self.unit_generator = unit_generator
         self.units = list(unit_generator)
         self.game_ended = False
         self.state_stack = []
-        self.switch_to_next_unit(board, 0, 0)
+        self.switch_to_next_unit(board, 0, 0, '')
 
-    def switch_to_next_unit(self, board, score, lines_cleared):
+    def current_move_seq(self):
+        return ''.join([s.move_chr for s in self.state_stack])
+
+    def switch_to_next_unit(self, board, score, lines_cleared, move_chr):
         cur_unit_index = -1 if len(self.state_stack) == 0 else self.current_state().unit_index
         next_unit_index = cur_unit_index + 1
 
@@ -255,7 +259,7 @@ class Game:
 
         if next_unit_index == len(self.units):
             self.game_ended = True
-            logging.debug('Game ended because no more pieces are available' % next_unit_index)
+            logging.debug('Game ended because no more pieces are available')
             return
 
         next_unit = self.units[next_unit_index]
@@ -276,7 +280,8 @@ class Game:
             score,
             PersistentStack(tail=(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)),
             lines_cleared,
-            next_phrases))
+            next_phrases,
+            move_chr))
 
     def ended(self):
         return self.game_ended
@@ -293,7 +298,7 @@ class Game:
     def board(self):
         return self.current_state().board
 
-    def commit_pos(self, pos):
+    def commit_pos(self, pos, move_chr):
         assert not self.ended()
 
         move_result = self.try_pos(pos)
@@ -302,8 +307,9 @@ class Game:
         if move_result == Game.MoveResult.Lock:
             logging.debug('Piece locked')
             (new_board, lines_cleared) = self.board().fix_unit_and_clear(self.cur_unit_pos())
-            move_score = Game.compute_points(len(self.cur_unit_pos().unit.cells), lines_cleared, self.state_stack[-1].lines_cleared_prev)
-            self.switch_to_next_unit(new_board, self.score() + move_score, lines_cleared)
+            logging.debug('Lines cleared: %d, prev lines cleared: %d' % (lines_cleared, self.current_state().lines_cleared_prev))
+            move_score = Game.compute_points(len(self.cur_unit_pos().unit.cells), lines_cleared, self.current_state().lines_cleared_prev)
+            self.switch_to_next_unit(new_board, self.score() + move_score, lines_cleared, move_chr)
         elif move_result == Game.MoveResult.Continue:
             self.state_stack.append(Game.State(
                 self.current_state().unit_index,
@@ -312,7 +318,8 @@ class Game:
                 self.current_state().score,
                 self.current_state().visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation)),
                 self.current_state().lines_cleared_prev,
-                dict(self.current_state().casted_phrases)))
+                dict(self.current_state().casted_phrases),
+                move_chr))
         else:
             logging.debug(move_result)
             assert False
@@ -349,7 +356,7 @@ class Game:
                 if self.try_pos(next_pos) == Game.MoveResult.Loss:
                     raise StopIteration
 
-                self.commit_pos(next_pos)
+                self.commit_pos(next_pos, c)
                 committed += 1
 
         except StopIteration:
