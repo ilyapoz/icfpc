@@ -286,7 +286,7 @@ class Game:
             logging.debug('Game ended because no more pieces are available')
 
             # Add a state even if there are no more pieces (so that the board drawing will be updated)
-            self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, None, None, move_chr))
+            self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, set(), None, move_chr))
 
             return
 
@@ -370,7 +370,8 @@ class Game:
         for i in range(steps):
             if len(self.state_stack) > 1:
                 pos = self.cur_unit_pos()
-                self.current_state().visited_set.remove((pos.pivot[0], pos.pivot[1], pos.rotation))
+                if pos is not None:
+                    self.current_state().visited_set.remove((pos.pivot[0], pos.pivot[1], pos.rotation))
                 self.state_stack.pop()
 
     def try_commit_phrase(self, phrase, stop_on_lock=True):
