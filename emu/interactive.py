@@ -1,9 +1,11 @@
 #!/usr/bin/python
+import factor
 import emu
+import phrases
+
 import argparse
 import json
 import curses
-import phrases
 
 
 def play(game, screen, game_index, game_count):

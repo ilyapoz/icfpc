@@ -1,4 +1,7 @@
 #!/usr/bin/python
+import factor
+import phrases
+
 import argparse
 import numpy
 import json
@@ -7,8 +10,6 @@ import os
 import unittest
 import math
 import logging
-import phrases
-import factor
 
 logging.basicConfig(filename='emu.log', level=logging.DEBUG)
 

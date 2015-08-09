@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from emu import *
+
 import numpy
 
 class Stat:
@@ -103,4 +104,4 @@ def units_until_end(game):
     return len(game.units) - game.current_state().unit_index
 
 def game_factors(game):
-    pass
+    return [units_until_end(game)]
