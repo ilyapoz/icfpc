@@ -380,11 +380,11 @@ class Game:
             if len(self.state_stack) > 1:
                 self.state_stack.pop()
 
-    def try_commit_phrase(self, phrase):
-        assert len(phrase) > 0
+    def try_commit_phrase(self, phrase, stop_on_lock=True):
         phrase = phrase.lower()
 
         next_pos = None
+        res = Game.MoveResult.Continue
         for i, c in enumerate(phrase):
             if self.ended():
                 return None, Game.MoveResult.Loss
@@ -395,10 +395,10 @@ class Game:
                 return None, res
 
             self.commit_pos(next_pos, c)
-            if res == Game.MoveResult.Lock:
+            if stop_on_lock and res == Game.MoveResult.Lock:
                 return next_pos, res
 
-        return next_pos, Game.MoveResult.Continue
+        return next_pos, res
 
 
 class UnitGenerator:
