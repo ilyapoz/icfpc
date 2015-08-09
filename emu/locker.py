@@ -7,7 +7,6 @@ class LockSearcher:
         self.game = game
 
     def dfs(self, pos):
-
         self.marked.add((pos.pivot, pos.rotation))
 
         for move, letter in [
@@ -25,7 +24,7 @@ class LockSearcher:
             if move_res == Game.MoveResult.Loss: continue
 
             if move_res == Game.MoveResult.Lock:
-                self.locked[(pos.pivot, pos.rotation)] = letter
+                self.lock_state[(pos.pivot, pos.rotation)] = letter
                 continue
 
             self.dfs(new_pos)
@@ -39,7 +38,7 @@ class LockSearcher:
 
     def find_lock_states(self):
         self.marked = set()
-        self.locked = {}
+        self.lock_state = {}
         self.back_move = {}
 
         start_pos = self.game.cur_unit_pos()
@@ -48,7 +47,9 @@ class LockSearcher:
 
         self.dfs(start_pos)
 
-        l = [(key, val) for key, val in self.locked.iteritems()]
+        return (self.lock_state, self.back_move)
+
+        l = [(key, val) for key, val in self.lock_state.iteritems()]
 
         lowest_pos, lowest_y = l[0], self.get_lowest_y(l[0])
 
