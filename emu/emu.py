@@ -262,6 +262,13 @@ class Game:
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
         next_phrases = {} if len(self.state_stack) == 0 else dict(self.current_state().casted_phrases)
 
+        if next_unit_index == 0 or self.try_pos_impl(next_unit_pos, board, None) == Game.MoveResult.Continue:
+            logging.debug('Piece %d started' % next_unit_index)
+        else:
+            self.game_ended = True
+            logging.debug('Game ended because piece %d cannot be placed' % next_unit_index)
+
+        # Add piece even if it cannot be added (so that the board drawing will be updated)
         self.state_stack.append(Game.State(
             next_unit_index,
             next_unit_pos,
@@ -270,11 +277,6 @@ class Game:
             PersistentStack(tail=(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)),
             lines_cleared,
             next_phrases))
-        if next_unit_index == 0 or self.try_pos_on_board(next_unit_pos, board) == Game.MoveResult.Continue:
-            logging.debug('Piece %d started' % next_unit_index)
-        else:
-            self.game_ended = True
-            logging.debug('Game ended because piece %d cannot be placed' % next_unit_index)
 
     def ended(self):
         return self.game_ended
@@ -316,10 +318,10 @@ class Game:
             assert False
 
     def try_pos(self, pos):
-        return self.try_pos_on_board(pos, self.board())
+        return self.try_pos_impl(pos, self.board(), self.current_state().visited_positions.items())
 
-    def try_pos_on_board(self, pos, board):
-        if (pos.pivot[0], pos.pivot[1], pos.rotation) in self.current_state().visited_positions.items():
+    def try_pos_impl(self, pos, board, visited_positions):
+        if visited_positions is not None and (pos.pivot[0], pos.pivot[1], pos.rotation) in visited_positions:
             return Game.MoveResult.Loss
 
         for x, y in pos.field_space():

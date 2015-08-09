@@ -9,7 +9,8 @@ def play(game, screen, game_index, game_count):
     last_res = ''
     can_quit = False
     while not can_quit:
-        screen.addstr(1, 5, 'Game: %d out of %d' % (game_index + 1, game_count))
+        screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
+                      (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
         screen.addstr(2, 5, 'Score: %d' % game.score())
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
         screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
