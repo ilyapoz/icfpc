@@ -40,6 +40,10 @@ def perimeter(field):
                         answer -= 1
     return answer
 
+def connected_components(field, filled=True):
+    visited = numpy.zeros(field.shape)
+    print visited
+
 ################################################
 # Board factors
 ################################################
@@ -70,7 +74,7 @@ def distance_from_start(board):
 
 
 def board_factors(board):
-    return line_factors(board) + distance_from_start(board) + [perimeter(board.field)]
+    return line_factors(board) + distance_from_start(board) + [perimeter(board.field), connected_components(board.field)]
 
 ################################################
 # Unit factors
@@ -88,7 +92,6 @@ def unit_perimeter(unit):
 
     pos = pos.south_west()
     board, dummy = board.fix_unit_and_clear(pos)
-    board.draw_field(None)
     return perimeter(board.field)
 
 def unit_factors(unit):
