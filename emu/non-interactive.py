@@ -22,8 +22,8 @@ def play(game, screen, game_index, game_count):
 
     while not can_quit:
         line_score = game.line_score()
-        phrase_score = game.phrase_score()
-        total_score = line_score + phrase_score
+        #phrase_score = game.phrase_score()
+        #total_score = line_score + phrase_score
 
         #screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
         #              (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))

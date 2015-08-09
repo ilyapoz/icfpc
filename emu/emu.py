@@ -222,26 +222,6 @@ class Board:
     syms = (('.', 'o'), ('*', '@'))
 
 
-class PersistentStack:
-    def __init__(self, head=None, tail=None):
-        self.head = head
-        self.tail = tail
-
-    def items(self):
-        if self.empty():
-            return
-        if self.head is not None:
-            for item in self.head.items():
-                yield item
-        yield self.tail
-
-    def push(self, value):
-        return PersistentStack(self, value)
-
-    def empty(self):
-        return self.tail is None
-
-
 class Game:
     class MoveResult:
         Loss = 'Loss'
@@ -276,12 +256,12 @@ class Game:
         return phrase_points
 
     class State:
-        def __init__(self, unit_index, unit_pos, board, line_score, visited_positions, lines_cleared_prev, move_chr):
+        def __init__(self, unit_index, unit_pos, board, line_score, visited_set, lines_cleared_prev, move_chr):
             self.unit_index = unit_index
             self.unit_pos = unit_pos
             self.board = board
             self.line_score = line_score
-            self.visited_positions = visited_positions
+            self.visited_set = visited_set
             self.lines_cleared_prev = lines_cleared_prev
             self.move_chr = move_chr
 
@@ -325,7 +305,7 @@ class Game:
             next_unit_pos,
             board,
             line_score,
-            PersistentStack(tail=(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)),
+            {(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)},
             lines_cleared,
             move_chr))
 
@@ -358,12 +338,13 @@ class Game:
             logging.debug('Prev score: %d, move score: %d' % (self.line_score(), move_score))
             self.switch_to_next_unit(new_board, self.line_score() + move_score, lines_cleared, move_chr)
         elif move_result == Game.MoveResult.Continue:
+            self.current_state().visited_set.add((pos.pivot[0], pos.pivot[1], pos.rotation))
             self.state_stack.append(Game.State(
                 self.current_state().unit_index,
                 pos,
                 self.current_state().board,
                 self.current_state().line_score,
-                self.current_state().visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation)),
+                self.current_state().visited_set,
                 self.current_state().lines_cleared_prev,
                 move_chr))
         else:
@@ -371,7 +352,7 @@ class Game:
             assert False
 
     def try_pos(self, pos):
-        return self.try_pos_impl(pos, self.board(), self.current_state().visited_positions.items())
+        return self.try_pos_impl(pos, self.board(), self.current_state().visited_set)
 
     def try_pos_impl(self, pos, board, visited_positions):
         if visited_positions is not None and (pos.pivot[0], pos.pivot[1], pos.rotation) in visited_positions:
@@ -388,6 +369,8 @@ class Game:
             self.game_ended = False
         for i in range(steps):
             if len(self.state_stack) > 1:
+                pos = self.cur_unit_pos()
+                self.current_state().visited_set.remove((pos.pivot[0], pos.pivot[1], pos.rotation))
                 self.state_stack.pop()
 
     def try_commit_phrase(self, phrase, stop_on_lock=True):
