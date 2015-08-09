@@ -8,6 +8,7 @@ import unittest
 import math
 import logging
 import phrases
+import factor
 
 logging.basicConfig(filename='emu.log', level=logging.DEBUG)
 
@@ -31,6 +32,13 @@ class Unit:
     @staticmethod
     def rot60(cell):
         return (-cell[1], cell[0] + cell[1])
+
+    @staticmethod
+    def distance(cell1, cell2):
+        x = cell2[0] - cell1[0]
+        y = cell2[1] - cell1[1]
+        z = -(x + y)
+        return (abs(x) + abs(y) + abs(z)) / 2
 
     @staticmethod
     def rotate(cell, rotation):
@@ -453,3 +461,4 @@ if __name__ == "__main__":
     pos = pos.south_west()
 
     board.draw_field(pos)
+    print factor.board_factors(board)
