@@ -280,7 +280,7 @@ class Game:
             logging.debug('Game ended because no more pieces are available')
 
             # Add a state even if there are no more pieces (so that the board drawing will be updated)
-            self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, None, None, None, move_chr))
+            self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, None, None, move_chr))
 
             return
 
