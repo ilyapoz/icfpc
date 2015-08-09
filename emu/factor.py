@@ -30,19 +30,44 @@ def perimeter(field):
             if field[x, y]:
                 answer += 6
 
-                for dx, dy in emu.Unit.shifts:
-                    x_unit, y_unit = emu.Unit.field_to_unit_space((x, y))
-                    xshifted = x_unit + dx
-                    yshifted = y_unit + dy
-                    xshifted, yshifted = emu.Unit.unit_to_field_space((xshifted, yshifted))
-
+                for xshifted, yshifted in emu.Unit.neighbors((x, y)):
                     if not emu.Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
                         answer -= 1
     return answer
 
-def connected_components(field, filled=True):
+def connected_components(field):
     visited = numpy.zeros(field.shape)
-    print visited
+    width, height = field.shape
+
+    def find_unvisited():
+        for x in range(width):
+            for y in range(height):
+                if emu.Unit.in_field((x, y), field) and field[x, y] and not visited[x, y]:
+                    return (x, y)
+
+    def discover(cell):
+        level = [cell]
+        visited[level[0]] = 1
+
+        while level:
+            next_level=[]
+
+            for cell in level:
+                for x, y in emu.Unit.neighbors(cell):
+                    if emu.Unit.in_field((x, y), field) and field[x, y] and not visited[x, y]:
+                        visited[x, y] = 1
+                        next_level.append((x, y))
+
+            level = next_level
+
+    answer = 0
+    while True:
+        x = find_unvisited()
+        if x is None:
+            return answer
+
+        answer += 1
+        discover(x)
 
 ################################################
 # Board factors
@@ -74,7 +99,7 @@ def distance_from_start(board):
 
 
 def board_factors(board):
-    return line_factors(board) + distance_from_start(board) + [perimeter(board.field), connected_components(board.field)]
+    return line_factors(board) + distance_from_start(board) + [perimeter(board.field), connected_components(board.field), connected_components(1 - board.field)]
 
 ################################################
 # Unit factors

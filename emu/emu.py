@@ -64,6 +64,15 @@ class Unit:
 
         return answer
 
+    @staticmethod
+    def neighbors(cell):
+        for dx, dy in Unit.shifts:
+            x_unit, y_unit = Unit.field_to_unit_space(cell)
+            xshifted = x_unit + dx
+            yshifted = y_unit + dy
+            yield Unit.unit_to_field_space((xshifted, yshifted))
+
+
     def calc_symmetry_class(self):
         pos = Position(self)
         hash_0 = pos.hash()
@@ -476,6 +485,11 @@ if __name__ == "__main__":
     pos.rotation = 1
 
     pos = pos.south_west()
+
+    board, dummy = board.fix_unit_and_clear(pos)
+
+    pos.rotation = 0
+    pos.pivot = (12, 17)
 
     board, dummy = board.fix_unit_and_clear(pos)
     board.draw_field(pos)
