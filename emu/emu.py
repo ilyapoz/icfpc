@@ -20,6 +20,21 @@ class Unit:
 
         self.cells = map(lambda x: (x[0] - pivot[0], x[1] - pivot[1]), self.cells)
         self.symmetry_class = self.calc_symmetry_class()
+        self.perimeter = factor.unit_perimeter(self)
+
+    shifts = (
+        (1, 0),
+        (0, 1),
+        (-1, 1),
+        (-1, 0),
+        (0, -1),
+        (1, -1),
+    )
+
+    @staticmethod
+    def in_field(cell, field):
+        width, height = numpy.shape(field)
+        return 0 <= cell[0] < width and 0 <= cell[1] < height
 
     @staticmethod
     def field_to_unit_space(coords):
@@ -139,7 +154,7 @@ class Board:
                 self.field[cell['x'], cell['y']] = 1
 
     def in_board(self, cell):
-        return 0 <= cell[0] < self.width and 0 <= cell[1] < self.height
+        return Unit.in_field(cell, self.field)
 
     def filled_lines(self):
         return numpy.nonzero(numpy.sum(self.field, 0) == self.width)[0].tolist()
@@ -456,9 +471,12 @@ if __name__ == "__main__":
 
     pos = Position(unit)
     pos.pivot = unit.starting_position
-    pos.rotation = 0
+    pos.rotation = 1
 
     pos = pos.south_west()
 
+    board, dummy = board.fix_unit_and_clear(pos)
     board.draw_field(pos)
     print factor.board_factors(board)
+
+    print factor.unit_factors(unit)
