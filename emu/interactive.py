@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import factor
 import emu
 import phrases
 

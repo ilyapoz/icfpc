@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from emu import *
+import emu
 
 import numpy
 
@@ -30,16 +30,14 @@ def perimeter(field):
             if field[x, y]:
                 answer += 6
 
-                for dx, dy in Unit.shifts:
-                    x_unit, y_unit = Unit.field_to_unit_space((x, y))
+                for dx, dy in emu.Unit.shifts:
+                    x_unit, y_unit = emu.Unit.field_to_unit_space((x, y))
                     xshifted = x_unit + dx
                     yshifted = y_unit + dy
-                    xshifted, yshifted = Unit.unit_to_field_space((xshifted, yshifted))
+                    xshifted, yshifted = emu.Unit.unit_to_field_space((xshifted, yshifted))
 
-                    if not Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
+                    if not emu.Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
                         answer -= 1
-
-
     return answer
 
 ################################################
@@ -61,12 +59,12 @@ def line_factors(board):
 
 def distance_from_start(board):
     stat = Stat()
-    origin = Unit.field_to_unit_space((board.width / 2, 0))
+    origin = emu.Unit.field_to_unit_space((board.width / 2, 0))
     for x in xrange(board.width):
         for y in xrange(board.height):
             if board.field[x, y]:
-                unit_space = Unit.field_to_unit_space((x, y))
-                stat.add(Unit.distance(origin, unit_space))
+                unit_space = emu.Unit.field_to_unit_space((x, y))
+                stat.add(emu.Unit.distance(origin, unit_space))
 
     return stat.perc([0, 25, 50, 100])
 
@@ -83,8 +81,8 @@ def unit_perimeter(unit):
     extent = (extent[0] * 5, extent[1] * 5)
     unit.calc_starting_position(extent[0])
 
-    board = Board(*extent)
-    pos = Position(unit)
+    board = emu.Board(*extent)
+    pos = emu.Position(unit)
     pos.pivot = unit.starting_position
     pos.rotation = 5
 
