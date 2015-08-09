@@ -82,13 +82,13 @@ def board_factors(board):
 
 def unit_perimeter(unit):
     extent = unit.extent()
-    extent = (extent[0] * 5, extent[1] * 5)
+    extent = (extent[0] + 5, extent[1] + 5)
     unit.calc_starting_position(extent[0])
 
     board = emu.Board(*extent)
     pos = emu.Position(unit)
     pos.pivot = unit.starting_position
-    pos.rotation = 5
+    pos.rotation = 0
 
     pos = pos.south_west()
     board, dummy = board.fix_unit_and_clear(pos)
