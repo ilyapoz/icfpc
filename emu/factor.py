@@ -33,7 +33,7 @@ def perimeter(field):
                 for xshifted, yshifted in emu.Unit.neighbors((x, y)):
                     if not emu.Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
                         answer -= 1
-    return answer
+    return float(answer) / (width + height)
 
 def connected_components(field):
     visited = numpy.zeros(field.shape)
@@ -86,20 +86,21 @@ def line_factors(board):
     return stat.perc([0, 25, 50, 75, 100])
 
 
-def distance_from_start(board):
-    stat = Stat()
+def mean_distance_sum(board):
+    dist_sum = 0.0
+    dist_count = 0
     origin = emu.Unit.field_to_unit_space((board.width / 2, 0))
     for x in xrange(board.width):
         for y in xrange(board.height):
             if board.field[x, y]:
                 unit_space = emu.Unit.field_to_unit_space((x, y))
-                stat.add(emu.Unit.distance(origin, unit_space))
+                dist = emu.Unit.distance(origin, unit_space)
+                dist_sum += dist
+                dist_count += 1
 
-    return stat.perc([0, 25, 50, 100])
+    mean_dist = 0.0 if dist_count == 0 else dist_sum / dist_count
+    return mean_dist / (board.width + board.height)
 
-
-def board_factors(board):
-    return line_factors(board) + distance_from_start(board) + [perimeter(board.field), connected_components(board.field), connected_components(1 - board.field)]
 
 ################################################
 # Unit factors
