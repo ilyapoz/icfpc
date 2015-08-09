@@ -19,7 +19,7 @@ def func(game, line_score, phrase_score):
 
     return res + line_score * 100
 
-def play(game, screen, game_index, game_count):
+def play(game, screen, game_index, game_count, silent):
     button_to_phrase = [(ord('1') + i, phrases.all[i]) for i in xrange(len(phrases.all))]
     phrase_legend = ', '.join(['%s for %s' % (chr(ph[0]), ph[1]) for ph in button_to_phrase])
     button_to_phrase_dict = dict(button_to_phrase)
@@ -33,18 +33,18 @@ def play(game, screen, game_index, game_count):
         phrase_score = game.phrase_score()
         total_score = line_score + phrase_score
 
-        screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
-                      (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
-        screen.addstr(2, 5, 'Score: %d + %d = %d' % (line_score, phrase_score, total_score))
-        screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
-        screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
-        screen.addstr(5, 5, '          %s' % phrase_legend)
-        screen.addstr(6, 5, '          %s' % str(last_res))
+        if not silent:
+            screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
+                        (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
+            screen.addstr(2, 5, 'Score: %d + %d = %d' % (line_score, phrase_score, total_score))
+            screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
+            screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
+            screen.addstr(5, 5, '          %s' % phrase_legend)
+            screen.addstr(6, 5, '          %s' % str(last_res))
 
-        screen.addstr(8, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
+            screen.addstr(8, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
 
-
-        screen.refresh()
+            screen.refresh()
 
         if seq == '':
             (lock_state, back_move) = locker.LockSearcher(game).find_lock_states()
@@ -127,6 +127,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f')
     parser.add_argument('--output_file', '-o')
+    parser.add_argument('--silent', action='store_true')
 
     args = parser.parse_args()
 
@@ -139,7 +140,7 @@ def main():
         results = []
         game_index = 0
         for game in emu.GameGenerator(config):
-            moves = play(game, screen, game_index, len(config['sourceSeeds']))
+            moves = play(game, screen, game_index, len(config['sourceSeeds']), args.silent)
             game_index += 1
             results.append({
                 'problemId': config['id'],
