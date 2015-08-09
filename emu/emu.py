@@ -7,6 +7,7 @@ import os
 import unittest
 import math
 import logging
+import phrases
 
 logging.basicConfig(filename='emu.log', level=logging.DEBUG)
 
@@ -222,23 +223,32 @@ class Game:
         line_bonus = (lines_cleared_prev - 1) * points / 10 if lines_cleared_prev > 1 else 0
         return points + line_bonus
 
-    def compute_points_for_phrase(self, phrase):
-        phrase = phrase.tolower()
-        old_reps = self.current_state().casted_phrases.get(phrase, 0)
-        if old_reps:
-            return len(phrase) * 2
-        else:
-            return len(phrase) * 2 + 300
+    def phrase_score(self):
+        phrase_counts = [0] * len(phrases.all)
+        moves = self.current_move_seq().lower()
+        for index, phrase in enumerate(phrases.all):
+            pos = -1
+            while True:
+                pos = moves.find(phrase.lower(), pos + 1)
+                if pos == -1:
+                    break
+                phrase_counts[index] += 1
+
+        phrase_points = 0
+        for i in xrange(len(phrases.all)):
+            if phrase_counts[i] != 0:
+                phrase_points += 2 * len(phrases.all[i]) * phrase_counts[i] + 300
+
+        return phrase_points
 
     class State:
-        def __init__(self, unit_index, unit_pos, board, score, visited_positions, lines_cleared_prev, casted_phrases, move_chr):
+        def __init__(self, unit_index, unit_pos, board, line_score, visited_positions, lines_cleared_prev, move_chr):
             self.unit_index = unit_index
             self.unit_pos = unit_pos
             self.board = board
-            self.score = score
+            self.line_score = line_score
             self.visited_positions = visited_positions
             self.lines_cleared_prev = lines_cleared_prev
-            self.casted_phrases = casted_phrases
             self.move_chr = move_chr
 
     def __init__(self, board, unit_generator):
@@ -251,7 +261,7 @@ class Game:
     def current_move_seq(self):
         return ''.join([s.move_chr for s in self.state_stack])
 
-    def switch_to_next_unit(self, board, score, lines_cleared, move_chr):
+    def switch_to_next_unit(self, board, line_score, lines_cleared, move_chr):
         cur_unit_index = -1 if len(self.state_stack) == 0 else self.current_state().unit_index
         next_unit_index = cur_unit_index + 1
 
@@ -262,13 +272,12 @@ class Game:
             logging.debug('Game ended because no more pieces are available')
 
             # Add a state even if there are no more pieces (so that the board drawing will be updated)
-            self.state_stack.append(Game.State(cur_unit_index, None, board, score, None, None, None, move_chr))
+            self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, None, None, None, move_chr))
 
             return
 
         next_unit = self.units[next_unit_index]
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
-        next_phrases = {} if len(self.state_stack) == 0 else dict(self.current_state().casted_phrases)
 
         if next_unit_index == 0 or self.try_pos_impl(next_unit_pos, board, None) == Game.MoveResult.Continue:
             logging.debug('Piece %d started' % next_unit_index)
@@ -281,10 +290,9 @@ class Game:
             next_unit_index,
             next_unit_pos,
             board,
-            score,
+            line_score,
             PersistentStack(tail=(next_unit_pos.pivot[0], next_unit_pos.pivot[1], next_unit_pos.rotation)),
             lines_cleared,
-            next_phrases,
             move_chr))
 
     def ended(self):
@@ -293,8 +301,8 @@ class Game:
     def current_state(self):
         return self.state_stack[-1]
 
-    def score(self):
-        return self.current_state().score
+    def line_score(self):
+        return self.current_state().line_score
 
     def cur_unit_pos(self):
         return None if self.ended() else self.current_state().unit_pos
@@ -313,17 +321,16 @@ class Game:
             (new_board, lines_cleared) = self.board().fix_unit_and_clear(self.cur_unit_pos())
             logging.debug('Lines cleared: %d, prev lines cleared: %d' % (lines_cleared, self.current_state().lines_cleared_prev))
             move_score = Game.compute_points(len(self.cur_unit_pos().unit.cells), lines_cleared, self.current_state().lines_cleared_prev)
-            logging.debug('Prev score: %d, move score: %d' % (self.score(), move_score))
-            self.switch_to_next_unit(new_board, self.score() + move_score, lines_cleared, move_chr)
+            logging.debug('Prev score: %d, move score: %d' % (self.line_score(), move_score))
+            self.switch_to_next_unit(new_board, self.line_score() + move_score, lines_cleared, move_chr)
         elif move_result == Game.MoveResult.Continue:
             self.state_stack.append(Game.State(
                 self.current_state().unit_index,
                 pos,
                 self.current_state().board,
-                self.current_state().score,
+                self.current_state().line_score,
                 self.current_state().visited_positions.push((pos.pivot[0], pos.pivot[1], pos.rotation)),
                 self.current_state().lines_cleared_prev,
-                dict(self.current_state().casted_phrases),
                 move_chr))
         else:
             logging.debug(move_result)
@@ -349,37 +356,25 @@ class Game:
             if len(self.state_stack) > 1:
                 self.state_stack.pop()
 
-    def try_phrase(self, phrase, commit, allow_locks=True):
-        phrase = phrase.tolower()
-        committed = 0
-        try:
-            for i, c in enumerate(phrase):
-                if self.ended():
-                    raise StopIteration
-                next_pos = self.cur_unit_pos().apply_char(c)
+    def try_commit_phrase(self, phrase):
+        assert len(phrase) > 0
+        phrase = phrase.lower()
 
-                res = self.try_pos(next_pos)
-                if res == Game.MoveResult.Loss:
-                    raise StopIteration
+        next_pos = None
+        for i, c in enumerate(phrase):
+            if self.ended():
+                return None, Game.MoveResult.Loss
+            next_pos = self.cur_unit_pos().apply_char(c)
 
-                if not allow_locks and res == Game.MoveResult.Lock and i != len(phrase) - 1:
-                    raise StopIteration
+            res = self.try_pos(next_pos)
+            if res == Game.MoveResult.Loss:
+                return None, res
 
-                self.commit_pos(next_pos, c)
-                committed += 1
+            self.commit_pos(next_pos, c)
+            if res == Game.MoveResult.Lock:
+                return next_pos, res
 
-        except StopIteration:
-            assert not commit
-            return 0
-        finally:
-            if not commit:
-                self.undo(committed)
-
-        if commit:
-            old = self.current_state().casted_phrases.get(phrase, 0)
-            self.current_state().casted_phrases[phrase] = old + 1
-
-        return self.compute_points_for_phrase(phrase)
+        return next_pos, Game.MoveResult.Continue
 
 
 class UnitGenerator:

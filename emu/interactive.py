@@ -3,56 +3,61 @@ import emu
 import argparse
 import json
 import curses
+import phrases
 
 
 def play(game, screen, game_index, game_count):
+    button_to_phrase = [(ord('1') + i, phrases.all[i]) for i in xrange(len(phrases.all))]
+    phrase_legend = ', '.join(['%s for %s' % (chr(ph[0]), ph[1]) for ph in button_to_phrase])
+    button_to_phrase_dict = dict(button_to_phrase)
+
     last_res = ''
     can_quit = False
     while not can_quit:
+        line_score = game.line_score()
+        phrase_score = game.phrase_score()
+        total_score = line_score + phrase_score
+
         screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
                       (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
-        screen.addstr(2, 5, 'Score: %d' % game.score())
+        screen.addstr(2, 5, 'Score: %d + %d = %d' % (line_score, phrase_score, total_score))
         screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
         screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
-        screen.addstr(5, 5, '          %s' % str(last_res))
+        screen.addstr(5, 5, '          %s' % phrase_legend)
+        screen.addstr(6, 5, '          %s' % str(last_res))
 
-        screen.addstr(7, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
+        screen.addstr(8, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
         screen.refresh()
 
         key = screen.getch()
 
         next_pos = None
-        move_chr = None
+        move_seq = None
         if not game.ended():
             if key in map(ord, ['w', 'W']):
-                move_chr = 'p'
+                move_seq = 'p'
             elif key in map(ord, ['e', 'E']):
-                move_chr = 'b'
+                move_seq = 'b'
             elif key in map(ord, ['a', 'A']):
-                move_chr = 'g'
+                move_seq = 'g'
             elif key in map(ord, ['d', 'D']):
-                move_chr = 'm'
+                move_seq = 'm'
             elif key in map(ord, ['q', 'Q']):
-                move_chr = 's'
+                move_seq = 's'
             elif key in map(ord, ['r', 'R']):
-                move_chr = 'q'
-
-            if move_chr is not None:
-                next_pos = game.cur_unit_pos().apply_char(move_chr)
+                move_seq = 'q'
+            elif key in button_to_phrase_dict.keys():
+                move_seq = button_to_phrase_dict[key]
 
         if key in map(ord, ['0']):
             can_quit = True
         elif key in map(ord, ['z', 'Z']):
             last_res = 'Undo'
             game.undo()
-
-        if next_pos is not None:
-            move_result = game.try_pos(next_pos)
-            last_res = move_result
-            if move_result != emu.Game.MoveResult.Loss:
-                game.commit_pos(next_pos, move_chr)
-                if game.ended():
-                    last_res += ' (Game over)'
+        elif move_seq is not None:
+            next_pos, last_res = game.try_commit_phrase(move_seq)
+            if game.ended():
+                last_res += ' (Game over)'
 
         screen.clear()
 
