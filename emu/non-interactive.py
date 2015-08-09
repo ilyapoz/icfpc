@@ -9,15 +9,25 @@ import json
 import curses
 import logging
 
+def norm(x, f = 10): return float(x) / (x + f)
+
 def func(game, line_score, phrase_score):
     board = game.board()
-    res = 0
+    sum_y = 0
 
     for x in xrange(board.width):
         for y in xrange(board.height):
-            if board.field[x, y] != 0: res += y
+            if board.field[x, y] != 0: sum_y += y
 
-    return res + line_score * 100
+    holes = -factor.connected_components(1 - board.field)
+    perim = -factor.perimeter(board.field) + line_score
+
+    m_height = -factor.line_factors(board)[-1]
+
+    hor = -factor.horiz_line_factor(board)
+
+    return hor + 5 * norm(sum_y) + 3 * norm(line_score) + 2 * norm(holes)
+    return 5 * norm(sum_y) + norm(line_score) + norm(perim, 50) + norm(m_height, 10)
 
 def play(game, screen, game_index, game_count, silent):
     button_to_phrase = [(ord('1') + i, phrases.all[i]) for i in xrange(len(phrases.all))]
