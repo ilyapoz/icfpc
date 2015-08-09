@@ -25,8 +25,8 @@ class Stat:
 def perimeter(field):
     width, height = numpy.shape(field)
     answer = 0
-    for x in range(width):
-        for y in range(height):
+    for x in xrange(width):
+        for y in xrange(height):
             if field[x, y]:
                 answer += 6
 
@@ -40,8 +40,8 @@ def connected_components(field):
     width, height = field.shape
 
     def find_unvisited():
-        for x in range(width):
-            for y in range(height):
+        for x in xrange(width):
+            for y in xrange(height):
                 if emu.Unit.in_field((x, y), field) and field[x, y] and not visited[x, y]:
                     return (x, y)
 
@@ -84,6 +84,23 @@ def line_factors(board):
             stat.add(0)
 
     return stat.perc([0, 25, 50, 75, 100])
+
+def horiz_line_factor(board):
+    v = numpy.zeros(board.height)
+
+    for x in xrange(board.width):
+        for y in xrange(board.height):
+            if board.field[x, y]:
+                v[y] += 1
+
+    nnz = 0
+    ans = 0
+    for x in v:
+        if x:
+            nnz += 1
+            ans += float(board.width - x) / board.width
+
+    return ans / board.height
 
 
 def mean_distance_sum(board):
