@@ -1,7 +1,4 @@
 #!/usr/bin/python
-import factor
-import phrases
-
 import argparse
 import numpy
 import json
@@ -10,6 +7,8 @@ import os
 import unittest
 import math
 import logging
+import phrases
+import factor
 
 logging.basicConfig(filename='emu.log', level=logging.DEBUG)
 
@@ -92,6 +91,8 @@ class Unit:
         right_coord = max([x + 1 + y % 2 * 0.5 for x, y in field_space])
 
         self.starting_position = (math.floor((field_width - (left_coord + right_coord)) / 2), -min_y)
+        assert self.starting_position[0] >= 0
+        self.starting_position = tuple(map(int, self.starting_position))
 
 
 class Position:
@@ -127,7 +128,7 @@ class Position:
         return Position(self.unit, self.pivot, (self.rotation + 1) % self.unit.symmetry_class)
 
     def ccw(self):
-        logging.debug('%d', self.rotation)
+        #logging.debug('%d', self.rotation)
         return Position(self.unit, self.pivot, (self.rotation - 1) % self.unit.symmetry_class)
 
     def hash(self):
@@ -289,7 +290,7 @@ class Game:
         cur_unit_index = -1 if len(self.state_stack) == 0 else self.current_state().unit_index
         next_unit_index = cur_unit_index + 1
 
-        logging.debug('switch_to_next_unit, cur_index=%d, next_index=%d, unit_count=%d' % (cur_unit_index, next_unit_index, len(self.units)))
+        #logging.debug('switch_to_next_unit, cur_index=%d, next_index=%d, unit_count=%d' % (cur_unit_index, next_unit_index, len(self.units)))
 
         if next_unit_index == len(self.units):
             self.game_ended = True
