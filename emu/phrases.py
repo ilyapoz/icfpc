@@ -1,3 +1,3 @@
 #!/usr/bin/python
 
-all = ["Yuggoth", "Ia! Ia!", "R'lyeh", "Ei!"]
+all = ["Yuggoth", "Ia! Ia!", "R'lyeh", "Ei!", "Cthulhu Fhtagn!"]
