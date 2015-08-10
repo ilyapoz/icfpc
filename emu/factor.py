@@ -25,23 +25,23 @@ class Stat:
 def perimeter(field):
     width, height = numpy.shape(field)
     answer = 0
-    for x in range(width):
-        for y in range(height):
+    for x in xrange(width):
+        for y in xrange(height):
             if field[x, y]:
                 answer += 6
 
                 for xshifted, yshifted in emu.Unit.neighbors((x, y)):
                     if not emu.Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
                         answer -= 1
-    return answer
+    return float(answer) / (width + height)
 
 def connected_components(field):
     visited = numpy.zeros(field.shape)
     width, height = field.shape
 
     def find_unvisited():
-        for x in range(width):
-            for y in range(height):
+        for x in xrange(width):
+            for y in xrange(height):
                 if emu.Unit.in_field((x, y), field) and field[x, y] and not visited[x, y]:
                     return (x, y)
 
@@ -85,21 +85,39 @@ def line_factors(board):
 
     return stat.perc([0, 25, 50, 75, 100])
 
+def horiz_line_factor(board):
+    v = numpy.zeros(board.height)
 
-def distance_from_start(board):
-    stat = Stat()
+    for x in xrange(board.width):
+        for y in xrange(board.height):
+            if board.field[x, y]:
+                v[y] += 1
+
+    nnz = 0
+    ans = 0
+    for x in v:
+        if x:
+            nnz += 1
+            ans += float(board.width - x) / board.width
+
+    return ans / board.height
+
+
+def mean_distance_sum(board):
+    dist_sum = 0.0
+    dist_count = 0
     origin = emu.Unit.field_to_unit_space((board.width / 2, 0))
     for x in xrange(board.width):
         for y in xrange(board.height):
             if board.field[x, y]:
                 unit_space = emu.Unit.field_to_unit_space((x, y))
-                stat.add(emu.Unit.distance(origin, unit_space))
+                dist = emu.Unit.distance(origin, unit_space)
+                dist_sum += dist
+                dist_count += 1
 
-    return stat.perc([0, 25, 50, 100])
+    mean_dist = 0.0 if dist_count == 0 else dist_sum / dist_count
+    return mean_dist / (board.width + board.height)
 
-
-def board_factors(board):
-    return line_factors(board) + distance_from_start(board) + [perimeter(board.field), connected_components(board.field), connected_components(1 - board.field)]
 
 ################################################
 # Unit factors
