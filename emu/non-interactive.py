@@ -105,11 +105,19 @@ def play(game, screen, game_index, game_count, silent):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', '-f')
+    parser.add_argument('--file', '-f', required=True)
     parser.add_argument('--output_file', '-o')
-    parser.add_argument('--silent', action='store_true')
+    parser.add_argument('-t', type=int)
+    parser.add_argument('-m', type=int)
+    parser.add_argument('-c', type=int)
+    parser.add_argument('-p', action='append')
+
+    parser.add_argument('--verbose', action='store_true')
 
     args = parser.parse_args()
+
+    if args.p:
+        phrases.all = args.p
 
     config = json.load(open(args.file))
 
@@ -120,7 +128,7 @@ def main():
         results = []
         game_index = 0
         for game in emu.GameGenerator(config):
-            moves = play(game, screen, game_index, len(config['sourceSeeds']), args.silent)
+            moves = play(game, screen, game_index, len(config['sourceSeeds']), not args.verbose)
             game_index += 1
             results.append({
                 'problemId': config['id'],
