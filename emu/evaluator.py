@@ -68,13 +68,13 @@ class Evaluator:
             def thread_func(index):
                 total_score = 0
 
-                for game in emu.GameGenerator(configs[i]):
+                for game in emu.GameGenerator(configs[index]):
                     Evaluator.play(game, score_func)
 
                     cur_score = game.line_score() + game.phrase_score()
                     total_score += cur_score
 
-                average_score = total_score // len(configs[i]['sourceSeeds'])
+                average_score = total_score // len(configs[index]['sourceSeeds'])
                 thread_scores[index] = average_score
 
             thread = threading.Thread(target=thread_func, args=(i,))
