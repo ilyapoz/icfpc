@@ -57,28 +57,34 @@ class Evaluator:
             #print seq
 
     @staticmethod
-    def evaluate(config, score_func):
-        if len(config['sourceSeeds']) == 0: return 0.0
+    def evaluate(configs, score_func):
+        overall_score = 0
 
-        max_score, min_score = 0, 1e100
-        total_score = 0
+        print
 
-        for game in emu.GameGenerator(config):
-            Evaluator.play(game, score_func)
+        for config in configs:
+            total_score = 0
 
-            cur_score = game.line_score() + game.phrase_score()
-            total_score += cur_score
+            print 'Problem %d' % config['id']
+            for game in emu.GameGenerator(config):
+                Evaluator.play(game, score_func)
 
-            min_score = min(min_score, cur_score)
-            max_score = max(max_score, cur_score)
+                cur_score = game.line_score() + game.phrase_score()
+                print 'Seed %d: score is %d' % (game.unit_generator.source_seed, cur_score)
 
-        average_score = total_score // len(config['sourceSeeds'])
+                total_score += cur_score
 
-        print 'Board #%d:' % config['id']
-        print '  min / max score: %d / %d' % (min_score, max_score)
-        print '  average score: %d' % int(average_score)
+            average_score = total_score // len(config['sourceSeeds'])
+            print 'Average score is %d' % average_score
+            print
 
-        return average_score
+            overall_score += average_score
+
+        overall_average_score = overall_score / len(configs)
+        print 'Overall average score is %d' % overall_average_score
+        print
+
+        return overall_average_score
 
 
 def inner(arr1, arr2):
@@ -91,11 +97,11 @@ def normalize(arr):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', '-f')
+    parser.add_argument('--files', '-f', nargs='+')
     #parser.add_argument('--output_file', '-o')
 
     args = parser.parse_args()
-    config = json.load(open(args.file))
+    configs = [json.load(open(f)) for f in args.files]
 
     def objective(w_holes, w_horiz_lines, w_dist_sum, w_perimeter, w_line_score, w_phrase_score):
         factor_weights = [w_holes, w_horiz_lines, w_dist_sum, w_perimeter, w_line_score, w_phrase_score]
@@ -121,7 +127,7 @@ def main():
             return inner(factor_weights, factors)
 
         print 'Evaluating...'
-        score = Evaluator.evaluate(config, score_func)
+        score = Evaluator.evaluate(configs, score_func)
         print 'Evaluation result: %f' % score
 
         return math.log(score)
