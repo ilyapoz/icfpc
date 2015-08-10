@@ -8,6 +8,7 @@ import argparse
 import json
 import curses
 import logging
+import sys
 
 def func(game, line_score, phrase_score):
     board = game.board()
@@ -122,8 +123,11 @@ def main():
     config = json.load(open(args.file))
 
     try:
-        screen = curses.initscr()
-        curses.cbreak()
+        if args.verbose:
+            screen = curses.initscr()
+            curses.cbreak()
+        else:
+            screen = []
 
         results = []
         game_index = 0
@@ -134,10 +138,12 @@ def main():
                 'problemId': config['id'],
                 'seed': game.unit_generator.source_seed,
                 'solution': moves})
-        json.dump(results, open(args.output_file, 'w'), indent=4)
+
+        json.dump(results, open(args.output_file, 'w') if args.output_file else sys.stdout, indent=4)
 
     finally:
-        curses.endwin()
+        if args.verbose:
+            curses.endwin()
 
 if __name__ == '__main__':
     main()
