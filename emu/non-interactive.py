@@ -10,7 +10,6 @@ import logging
 import sys
 
 def func(game, line_score, phrase_score):
-    return 0
     board = game.board()
 
     res = 0
