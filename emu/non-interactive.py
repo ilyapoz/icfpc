@@ -8,6 +8,7 @@ import argparse
 import json
 import curses
 import logging
+import sys
 
 def func(game, line_score, phrase_score):
     board = game.board()
@@ -105,31 +106,47 @@ def play(game, screen, game_index, game_count, silent):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', '-f')
+    parser.add_argument('--file', '-f', required=True, action='append')
     parser.add_argument('--output_file', '-o')
-    parser.add_argument('--silent', action='store_true')
+    parser.add_argument('-t', type=int)
+    parser.add_argument('-m', type=int)
+    parser.add_argument('-c', type=int)
+    parser.add_argument('-p', action='append')
+
+    parser.add_argument('--verbose', action='store_true')
 
     args = parser.parse_args()
 
-    config = json.load(open(args.file))
+    if args.p:
+        phrases.all = args.p
 
-    try:
-        screen = curses.initscr()
-        curses.cbreak()
+    results = []
 
-        results = []
-        game_index = 0
-        for game in emu.GameGenerator(config):
-            moves = play(game, screen, game_index, len(config['sourceSeeds']), args.silent)
-            game_index += 1
-            results.append({
-                'problemId': config['id'],
-                'seed': game.unit_generator.source_seed,
-                'solution': moves})
-        json.dump(results, open(args.output_file, 'w'), indent=4)
+    for input_file in args.file:
+        config = json.load(open(input_file))
 
-    finally:
-        curses.endwin()
+        try:
+            if args.verbose:
+                screen = curses.initscr()
+                curses.cbreak()
+            else:
+                screen = []
+
+            game_index = 0
+            for game in emu.GameGenerator(config):
+                moves = play(game, screen, game_index, len(config['sourceSeeds']), not args.verbose)
+                game_index += 1
+                results.append({
+                    'problemId': config['id'],
+                    'seed': game.unit_generator.source_seed,
+                    'solution': moves})
+
+
+        finally:
+            if args.verbose:
+                curses.endwin()
+
+    json.dump(results, open(args.output_file, 'w') if args.output_file else sys.stdout, indent=4)
 
 if __name__ == '__main__':
     main()
