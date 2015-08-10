@@ -6,11 +6,11 @@ import locker
 
 import argparse
 import json
-import curses
 import logging
 import sys
 
 def func(game, line_score, phrase_score):
+    return 0
     board = game.board()
 
     res = 0
@@ -127,6 +127,7 @@ def main():
 
         try:
             if args.verbose:
+                import curses
                 screen = curses.initscr()
                 curses.cbreak()
             else:

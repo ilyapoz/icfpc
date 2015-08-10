@@ -2,5 +2,5 @@ Hey, it's out try at a solution.
 It was nice, but difficult and we don't have much time.
 Options for time limits etc are not supported unfortunately.
 
-Otherwise feel free to run with --verbose to look at the games in real time while they're being solved.
+Otherwise feel free to run with --verbose to look at the games in real time while they're being solved (will need curses)
 Cheers.
