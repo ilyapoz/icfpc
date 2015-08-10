@@ -11,36 +11,34 @@ import logging
 
 def func(game, line_score, phrase_score):
     board = game.board()
+
     res = 0
 
     for x in xrange(board.width):
         for y in xrange(board.height):
-            if board.field[x, y] != 0: res += y
+            if board.field[x, y] != 0:
+                res += y
 
     return res + line_score * 100
 
 def play(game, screen, game_index, game_count, silent):
     button_to_phrase = [(ord('1') + i, phrases.all[i]) for i in xrange(len(phrases.all))]
     phrase_legend = ', '.join(['%s for %s' % (chr(ph[0]), ph[1]) for ph in button_to_phrase])
-    button_to_phrase_dict = dict(button_to_phrase)
 
-    last_res = ''
-    can_quit = False
     seq = ''
 
-    while not can_quit:
+    while True:
         line_score = game.line_score()
         phrase_score = game.phrase_score()
         total_score = line_score + phrase_score
 
         if not silent:
             screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
-                        (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
-            screen.addstr(2, 5, 'Score: %d + %d = %d' % (line_score, phrase_score, total_score))
+                          (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
+            screen.addstr(2, 5, 'Score: %6d + %6d = %6d' % (line_score, phrase_score, total_score))
             screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
             screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
             screen.addstr(5, 5, '          %s' % phrase_legend)
-            screen.addstr(6, 5, '          %s' % str(last_res))
 
             screen.addstr(8, 0, game.board().get_field_str(game.cur_unit_pos(), ext=0))
 
@@ -54,20 +52,23 @@ def play(game, screen, game_index, game_count, silent):
 
             best_lock_state, best_lock_score = None, 0
 
-            for state, letter in lock_state.iteritems():
+            for state, lock_phrase in lock_state.iteritems():
                 line_score = -game.line_score()
                 phrase_score = 0
 
                 undo_times = 1
                 pos_before_lock = emu.Position(cur_unit, state[0], state[1])
 
+                for letter in lock_phrase[:-1]:
+                    pos_before_lock = pos_before_lock.apply_char(letter)
+
                 if ((cur_pos.pivot, cur_pos.rotation) !=
                     (pos_before_lock.pivot, pos_before_lock.rotation)):
                     game.commit_pos(pos_before_lock, '?')
                     undo_times += 1
 
-                lock_pos = pos_before_lock.apply_char(letter)
-                game.commit_pos(lock_pos, letter)
+                lock_pos = pos_before_lock.apply_char(lock_phrase[-1])
+                game.commit_pos(lock_pos, lock_phrase[-1])
 
                 line_score += game.line_score()
                 position_score = func(game, line_score, phrase_score)
@@ -85,38 +86,17 @@ def play(game, screen, game_index, game_count, silent):
                 seq = cur_state[1] + seq
                 cur_state = back_move.get(cur_state[0])
 
-        key = ord('w')
+        _, move_res = game.try_commit_phrase(seq[0])
 
-        next_pos = None
-        move_seq = None
-        if not game.ended():
-            if key in map(ord, ['w', 'W']):
-                move_seq = 'p'
-            elif key in map(ord, ['e', 'E']):
-                move_seq = 'b'
-            elif key in map(ord, ['a', 'A']):
-                move_seq = 'g'
-            elif key in map(ord, ['d', 'D']):
-                move_seq = 'm'
-            elif key in map(ord, ['q', 'Q']):
-                move_seq = 's'
-            elif key in map(ord, ['r', 'R']):
-                move_seq = 'q'
-            elif key in button_to_phrase_dict.keys():
-                move_seq = button_to_phrase_dict[key]
+        if move_res == emu.Game.MoveResult.Loss:
+            #logging.debug('ERRRRRRRRRRORRRRRRRROOORORORO !!!!!!!!')
+            seq = ''
+            continue
 
-        if key in map(ord, ['0']):
-            can_quit = True
-        elif key in map(ord, ['z', 'Z']):
-            last_res = 'Undo'
-            game.undo()
-        elif move_seq is not None:
-            move_seq = seq[0]
-            seq = seq[1:]
-            next_pos, last_res = game.try_commit_phrase(move_seq)
-            if game.ended():
-                 last_res += ' (Game over)'
-                 break
+        seq = seq[1:]
+
+        if game.ended():
+            break
 
         #screen.clear()
 

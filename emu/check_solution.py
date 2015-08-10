@@ -10,6 +10,7 @@ def play(game, solution_config):
     _, outcome = game.try_commit_phrase(solution_config['solution'], stop_on_lock=False)
     if outcome == emu.Game.MoveResult.Loss:
         print 'Game with seed %d: LOSS' % solution_config['seed']
+        return 0.0
     else:
         line_score = game.line_score()
         phrase_score = game.phrase_score()
@@ -17,6 +18,7 @@ def play(game, solution_config):
         end_marker = '' if game.ended() else '[NOT ENDED]'
         print 'Game with seed %d: %d + %d = %d points %s' % \
               (solution_config['seed'], line_score, phrase_score, total_score, end_marker)
+        return total_score
 
 def main():
     parser = argparse.ArgumentParser()
@@ -31,12 +33,16 @@ def main():
     assert len(game_config['sourceSeeds']) == len(solution_config)
 
     game_index = 0
+    average_score = 0.0
     for game in emu.GameGenerator(game_config):
         assert solution_config[game_index]['seed'] == game.unit_generator.source_seed
         assert solution_config[game_index]['problemId'] == game_config['id']
 
-        play(game, solution_config[game_index])
+        average_score += play(game, solution_config[game_index])
         game_index += 1
+
+    average_score = average_score // len(game_config['sourceSeeds'])
+    print 'Board #%d: average_score = %d' % (game_config['id'], int(average_score))
 
 if __name__ == '__main__':
     main()

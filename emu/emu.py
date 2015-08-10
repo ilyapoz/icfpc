@@ -10,7 +10,7 @@ import logging
 import phrases
 import factor
 
-logging.basicConfig(filename='emu.log', level=logging.DEBUG)
+logging.basicConfig(filename='/dev/null', level=logging.DEBUG)
 
 class Unit:
     def __init__(self, cells, pivot):
@@ -94,10 +94,10 @@ class Unit:
         pos = Position(self);
         pos.pivot = (0, -min_y)
         field_space = list(pos.field_space())
-        field_width = width + 0.5
+        field_width = width
 
-        left_coord = min([x + y % 2 * 0.5 for x, y in field_space])
-        right_coord = max([x + 1 + y % 2 * 0.5 for x, y in field_space])
+        left_coord = min([x for x, y in field_space])
+        right_coord = max([x + 1 for x, y in field_space])
 
         self.starting_position = (math.floor((field_width - (left_coord + right_coord)) / 2), -min_y)
         assert self.starting_position[0] >= 0
@@ -276,6 +276,8 @@ class Game:
         return ''.join([s.move_chr for s in self.state_stack])
 
     def switch_to_next_unit(self, board, line_score, lines_cleared, move_chr):
+        #logging.debug('switch_to_next_unit')
+
         cur_unit_index = -1 if len(self.state_stack) == 0 else self.current_state().unit_index
         next_unit_index = cur_unit_index + 1
 
@@ -283,7 +285,7 @@ class Game:
 
         if next_unit_index == len(self.units):
             self.game_ended = True
-            logging.debug('Game ended because no more pieces are available')
+            #logging.debug('Game ended because no more pieces are available')
 
             # Add a state even if there are no more pieces (so that the board drawing will be updated)
             self.state_stack.append(Game.State(cur_unit_index, None, board, line_score, set(), None, move_chr))
@@ -294,10 +296,11 @@ class Game:
         next_unit_pos = Position(next_unit, next_unit.starting_position, 0)
 
         if next_unit_index == 0 or self.try_pos_impl(next_unit_pos, board, None) == Game.MoveResult.Continue:
-            logging.debug('Piece %d started' % next_unit_index)
+            #logging.debug('Piece %d started' % next_unit_index)
+            pass
         else:
             self.game_ended = True
-            logging.debug('Game ended because piece %d cannot be placed' % next_unit_index)
+            #logging.debug('Game ended because piece %d cannot be placed' % next_unit_index)
 
         # Add a state even if a unit cannot be added (so that the board drawing will be updated)
         self.state_stack.append(Game.State(
@@ -331,11 +334,11 @@ class Game:
         assert move_result != Game.MoveResult.Loss
 
         if move_result == Game.MoveResult.Lock:
-            logging.debug('Piece locked')
+            #logging.debug('Piece locked at %s %s', pos.pivot, pos.rotation)
             (new_board, lines_cleared) = self.board().fix_unit_and_clear(self.cur_unit_pos())
-            logging.debug('Lines cleared: %d, prev lines cleared: %d' % (lines_cleared, self.current_state().lines_cleared_prev))
+            #logging.debug('Lines cleared: %d, prev lines cleared: %d' % (lines_cleared, self.current_state().lines_cleared_prev))
             move_score = Game.compute_points(len(self.cur_unit_pos().unit.cells), lines_cleared, self.current_state().lines_cleared_prev)
-            logging.debug('Prev score: %d, move score: %d' % (self.line_score(), move_score))
+            #logging.debug('Prev score: %d, move score: %d' % (self.line_score(), move_score))
             self.switch_to_next_unit(new_board, self.line_score() + move_score, lines_cleared, move_chr)
         elif move_result == Game.MoveResult.Continue:
             self.current_state().visited_set.add((pos.pivot[0], pos.pivot[1], pos.rotation))
@@ -348,7 +351,7 @@ class Game:
                 self.current_state().lines_cleared_prev,
                 move_chr))
         else:
-            logging.debug(move_result)
+            #logging.debug(move_result)
             assert False
 
     def try_pos(self, pos):
@@ -440,7 +443,7 @@ class GameGenerator:
         self.current_seed_index += 1
         if self.current_seed_index == len(self.source_seeds):
             raise StopIteration
-        logging.debug('Game with seed %d started' % self.current_seed_index)
+        #logging.debug('Game with seed %d started' % self.current_seed_index)
         return Game(Board(self.config['width'], self.config['height'], self.config['filled']),
                     UnitGenerator(self.units, self.source_seeds[self.current_seed_index], self.source_length))
 

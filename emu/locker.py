@@ -1,5 +1,7 @@
 #!/usr/bin/python
 from emu import *
+import phrases
+
 import logging
 
 class LockSearcher:
@@ -9,32 +11,39 @@ class LockSearcher:
     def dfs(self, pos):
         self.marked.add((pos.pivot, pos.rotation))
 
-        for move, letter in [
-            (Position.south_west, 'a'),
-            (Position.south_east, 'l'),
-            (Position.west, 'p'),
-            (Position.east, 'b'),
-            (Position.cw, 'd'),
-            (Position.ccw, 'k')
-        ]:
-            new_pos = move(pos)
-            if (new_pos.pivot, new_pos.rotation) in self.marked: continue
+        for phrase in phrases.all_sorted_lower:
+            new_pos = Position(pos.unit, pos.pivot, pos.rotation)
 
+            bad = False
+
+            for letter in phrase[:-1]:
+                new_pos = new_pos.apply_char(letter)
+                move_res = self.game.try_pos(new_pos)
+
+                if (   move_res == Game.MoveResult.Loss
+                    or move_res == Game.MoveResult.Lock
+                    or (new_pos.pivot, new_pos.rotation) in self.marked):
+                    bad = True
+                    break
+
+            if bad: continue
+
+            prev_pivot, prev_rotation = new_pos.pivot, new_pos.rotation
+
+            new_pos = new_pos.apply_char(phrase[-1])
             move_res = self.game.try_pos(new_pos)
-            if move_res == Game.MoveResult.Loss: continue
 
-            if move_res == Game.MoveResult.Lock:
-                self.lock_state[(pos.pivot, pos.rotation)] = letter
+            if (   move_res == Game.MoveResult.Loss
+                or (new_pos.pivot, new_pos.rotation) in self.marked):
                 continue
 
+            if move_res == Game.MoveResult.Lock:
+                self.lock_state[(pos.pivot, pos.rotation)] = phrase
+                continue
+
+            self.marked.add((prev_pivot, prev_rotation))
             self.dfs(new_pos)
-            self.back_move[(new_pos.pivot, new_pos.rotation)] = ((pos.pivot, pos.rotation), letter)
-
-    def get_lowest_y(self, coords):
-        cur_unit = self.game.current_state().unit_pos.unit
-        pos = Position(cur_unit, coords[0][0], coords[0][1])
-
-        return sum(cell[1] for cell in pos.field_space())
+            self.back_move[(new_pos.pivot, new_pos.rotation)] = ((pos.pivot, pos.rotation), phrase)
 
     def find_lock_states(self):
         self.marked = set()
@@ -48,20 +57,3 @@ class LockSearcher:
         self.dfs(start_pos)
 
         return (self.lock_state, self.back_move)
-
-        l = [(key, val) for key, val in self.lock_state.iteritems()]
-
-        lowest_pos, lowest_y = l[0], self.get_lowest_y(l[0])
-
-        for pos in l:
-            pos_y = self.get_lowest_y(pos)
-            if pos_y > lowest_y:
-                lowest_pos, lowest_y = pos, pos_y
-
-        seq = ''
-
-        while lowest_pos is not None:
-            seq = lowest_pos[1] + seq
-            lowest_pos = self.back_move.get(lowest_pos[0])
-
-        return seq
