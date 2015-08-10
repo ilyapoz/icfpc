@@ -10,7 +10,7 @@ import logging
 import phrases
 import factor
 
-logging.basicConfig(filename='emu.log', level=logging.DEBUG)
+logging.basicConfig(filename='emu.log', level=logging.INFO)
 
 class Unit:
     def __init__(self, cells, pivot):
@@ -30,6 +30,24 @@ class Unit:
         (0, -1),
         (1, -1),
     )
+
+    shifts0 =( (
+        (1, 0),
+        (0, 1),
+        (-1, 1),
+        (-1, 0),
+        (-1, -1),
+        (0, -1),
+    ),
+
+    (
+        (1, 0),
+        (1, 1),
+        (0, 1),
+        (-1, 0),
+        (0, -1),
+        (1, -1),
+    ))
 
     @staticmethod
     def in_field(cell, field):
@@ -66,12 +84,15 @@ class Unit:
 
     @staticmethod
     def neighbors(cell):
+        return Unit.shifts0[cell[1]%2]
+
+    @staticmethod
+    def neighbors_old(cell):
         for dx, dy in Unit.shifts:
             x_unit, y_unit = Unit.field_to_unit_space(cell)
             xshifted = x_unit + dx
             yshifted = y_unit + dy
             yield Unit.unit_to_field_space((xshifted, yshifted))
-
 
     def calc_symmetry_class(self):
         pos = Position(self)
@@ -417,9 +438,8 @@ class UnitGenerator:
             raise StopIteration
         self.emitted_unit_count += 1
         random_number = UnitGenerator.get_bits(self.current_seed, 16, 31) >> 16
-        index = random_number % len(self.units)
         self.current_seed = (self.current_seed * 1103515245 + 12345) % (2 ** 32)
-        return self.units[index]
+        return random_number
 
 
 class GameGenerator:
@@ -446,6 +466,10 @@ class GameGenerator:
 
 
 if __name__ == "__main__":
+    import sys
+    gen = UnitGenerator([], int(sys.argv[1]), 50)
+    print "\n".join(map(str, gen))
+    sys.exit()
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', '-f')
     parser.add_argument('--unit', type=int, default=0)

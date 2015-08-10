@@ -20,14 +20,14 @@ def func(game, line_score, phrase_score):
         for y in xrange(board.height):
             if board.field[x, y] != 0: sum_y += y
 
-    holes = -factor.connected_components(1 - board.field)
+#    holes = -factor.connected_components(1 - board.field)
     perim = -factor.perimeter(board.field) + line_score
 
     m_height = -factor.line_factors(board)[-1]
 
     hor = -factor.horiz_line_factor(board)
 
-    return hor + 5 * norm(sum_y) + 3 * norm(line_score) + 2 * norm(holes)
+    return hor + 5 * norm(sum_y) + 3 * norm(line_score) + 2 * norm(perim)
     return 5 * norm(sum_y) + norm(line_score) + norm(perim, 50) + norm(m_height, 10)
 
 def play(game, screen, game_index, game_count, silent):
@@ -45,9 +45,9 @@ def play(game, screen, game_index, game_count, silent):
         total_score = line_score + phrase_score
 
         if not silent:
-            screen.addstr(1, 5, 'Game %d out of %d, unit %d out of %d' % \
+            screen.addstr(1, 5, 'Game %2d out of %2d, unit %2d out of %2d' % \
                         (game_index + 1, game_count, game.current_state().unit_index + 1, len(game.units)))
-            screen.addstr(2, 5, 'Score: %d + %d = %d' % (line_score, phrase_score, total_score))
+            screen.addstr(2, 5, 'Score: %5d + %5d = %5d' % (line_score, phrase_score, total_score))
             screen.addstr(3, 5, 'Controls: W to go west, E to go east, A to go south west, D to go south east,')
             screen.addstr(4, 5, '          Q to turn ccw, R to turn clockwise, Z to cancel move, 0 to stop the current game.')
             screen.addstr(5, 5, '          %s' % phrase_legend)
@@ -163,8 +163,8 @@ def main():
         curses.endwin()
 
 if __name__ == '__main__':
-    main()
-    sys.exit()
+#    main()
+#    sys.exit()
 
     import cProfile, pstats, StringIO
     pr = cProfile.Profile()

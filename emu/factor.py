@@ -31,6 +31,8 @@ def perimeter(field):
                 answer += 6
 
                 for xshifted, yshifted in emu.Unit.neighbors((x, y)):
+                    xshifted = x + xshifted
+                    yshifted = y + xshifted
                     if not emu.Unit.in_field((xshifted, yshifted), field) or field[xshifted, yshifted]:
                         answer -= 1
     return float(answer) / (width + height)
@@ -42,7 +44,7 @@ def connected_components(field):
     def find_unvisited():
         for x in xrange(width):
             for y in xrange(height):
-                if emu.Unit.in_field((x, y), field) and field[x, y] and not visited[x, y]:
+                if field[x, y] and not visited[x, y]:
                     return (x, y)
 
     def discover(cell):

@@ -64,6 +64,10 @@ class TestUnit(unittest.TestCase):
             for i in range(len(circle) - 1):
                 self.assertEqual(Unit.rot60(circle[i]), circle[i + 1])
 
+    def test_neigh(self):
+        for cell in [(0, 0), (0, 1)]:
+            self.assertEqual(list(Unit.neighbors(cell)), list(Unit.neighbors_old(cell)))
+
 class TestStat(unittest.TestCase):
     def test_trivial(self):
         stat = Stat()

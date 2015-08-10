@@ -1,0 +1,271 @@
+(B)0[?1049h[1;72r[m[4l[72;1H[?1049l[?1l>         1798533 function calls (1793050 primitive calls) in 1.237 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   106106    0.106    0.000    0.298    0.000 /home/lenin/prg/icfpc/emu/emu.py:113(field_space)
+    17704    0.085    0.000    0.429    0.000 /home/lenin/prg/icfpc/emu/emu.py:357(try_pos_impl)
+    85845    0.084    0.000    0.145    0.000 /home/lenin/prg/icfpc/emu/emu.py:58(rotate)
+     8946    0.068    0.000    0.121    0.000 /usr/lib64/python2.7/logging/__init__.py:243(__init__)
+    74050    0.049    0.000    0.068    0.000 /home/lenin/prg/icfpc/emu/emu.py:34(in_field)
+  5465/11    0.047    0.000    0.354    0.032 /home/lenin/prg/icfpc/emu/locker.py:9(dfs)
+     4698    0.042    0.000    0.806    0.000 /home/lenin/prg/icfpc/emu/emu.py:327(commit_pos)
+   161101    0.037    0.000    0.037    0.000 /home/lenin/prg/icfpc/emu/emu.py:47(rot60)
+     8946    0.030    0.000    0.030    0.000 {method 'flush' of 'file' objects}
+    98374    0.029    0.000    0.029    0.000 /home/lenin/prg/icfpc/emu/emu.py:39(field_to_unit_space)
+    98176    0.026    0.000    0.026    0.000 /home/lenin/prg/icfpc/emu/emu.py:43(unit_to_field_space)
+    73060    0.026    0.000    0.093    0.000 /home/lenin/prg/icfpc/emu/emu.py:167(in_board)
+    88079    0.024    0.000    0.024    0.000 {range}
+     8946    0.024    0.000    0.034    0.000 /usr/lib64/python2.7/logging/__init__.py:1226(findCaller)
+    17892    0.021    0.000    0.030    0.000 /usr/lib64/python2.7/threading.py:147(acquire)
+    17892    0.021    0.000    0.027    0.000 /usr/lib64/python2.7/threading.py:187(release)
+    74083    0.018    0.000    0.018    0.000 /usr/lib64/python2.7/site-packages/numpy/core/fromnumeric.py:1454(shape)
+     2237    0.017    0.000    0.185    0.000 /home/lenin/prg/icfpc/emu/emu.py:278(switch_to_next_unit)
+     8946    0.016    0.000    0.031    0.000 /usr/lib64/python2.7/logging/__init__.py:458(format)
+     2269    0.016    0.000    0.016    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     8946    0.015    0.000    0.136    0.000 /usr/lib64/python2.7/logging/__init__.py:847(emit)
+     8946    0.014    0.000    0.424    0.000 /usr/lib64/python2.7/logging/__init__.py:1138(debug)
+        1    0.014    0.014    1.221    1.221 ./non-interactive.py:35(play)
+    15468    0.013    0.000    0.394    0.000 /home/lenin/prg/icfpc/emu/emu.py:354(try_pos)
+     8946    0.013    0.000    0.400    0.000 /usr/lib64/python2.7/logging/__init__.py:1260(_log)
+     2269    0.013    0.000    0.040    0.000 /home/lenin/prg/icfpc/emu/emu.py:170(filled_lines)
+     2269    0.013    0.000    0.109    0.000 /home/lenin/prg/icfpc/emu/emu.py:188(fix_unit_and_clear)
+    39894    0.013    0.000    0.013    0.000 /home/lenin/prg/icfpc/emu/emu.py:108(__init__)
+     8946    0.013    0.000    0.077    0.000 /usr/lib64/python2.7/logging/__init__.py:836(flush)
+     8946    0.012    0.000    0.202    0.000 /usr/lib64/python2.7/logging/__init__.py:744(handle)
+     2225    0.012    0.000    0.020    0.000 /home/lenin/prg/icfpc/emu/emu.py:367(undo)
+     8946    0.010    0.000    0.212    0.000 /usr/lib64/python2.7/logging/__init__.py:1313(callHandlers)
+    77464    0.010    0.000    0.010    0.000 /home/lenin/prg/icfpc/emu/emu.py:315(current_state)
+     8946    0.010    0.000    0.435    0.000 /usr/lib64/python2.7/logging/__init__.py:1624(debug)
+     8946    0.010    0.000    0.013    0.000 /usr/lib64/python2.7/genericpath.py:85(_splitext)
+     8946    0.010    0.000    0.145    0.000 /usr/lib64/python2.7/logging/__init__.py:941(emit)
+     8946    0.009    0.000    0.130    0.000 /usr/lib64/python2.7/logging/__init__.py:1247(makeRecord)
+    17892    0.009    0.000    0.039    0.000 /usr/lib64/python2.7/logging/__init__.py:701(acquire)
+    17892    0.009    0.000    0.035    0.000 /usr/lib64/python2.7/logging/__init__.py:708(release)
+     2269    0.008    0.000    0.008    0.000 {numpy.core.multiarray.array}
+     8946    0.008    0.000    0.009    0.000 /usr/lib64/python2.7/logging/__init__.py:154(getLevelName)
+     5738    0.008    0.000    0.013    0.000 /home/lenin/prg/icfpc/emu/emu.py:131(south_east)
+     5603    0.008    0.000    0.013    0.000 /home/lenin/prg/icfpc/emu/emu.py:126(south_west)
+    26839    0.008    0.000    0.008    0.000 {method 'rfind' of 'str' objects}
+     8946    0.008    0.000    0.223    0.000 /usr/lib64/python2.7/logging/__init__.py:1281(handle)
+    20255    0.007    0.000    0.007    0.000 {isinstance}
+    17704    0.007    0.000    0.009    0.000 /home/lenin/prg/icfpc/emu/emu.py:324(board)
+    35784    0.006    0.000    0.006    0.000 /usr/lib64/python2.7/threading.py:64(_note)
+     8947    0.006    0.000    0.010    0.000 /usr/lib64/python2.7/posixpath.py:119(basename)
+     8946    0.006    0.000    0.009    0.000 /usr/lib64/python2.7/logging/__init__.py:1353(isEnabledFor)
+     9181    0.006    0.000    0.008    0.000 /home/lenin/prg/icfpc/emu/emu.py:321(cur_unit_pos)
+     2477    0.006    0.000    0.010    0.000 /home/lenin/prg/icfpc/emu/emu.py:146(apply_char)
+    17892    0.006    0.000    0.006    0.000 /usr/lib64/python2.7/logging/__init__.py:605(filter)
+    35811    0.005    0.000    0.005    0.000 {hasattr}
+     8946    0.005    0.000    0.007    0.000 /usr/lib64/python2.7/logging/__init__.py:318(getMessage)
+    53676    0.005    0.000    0.005    0.000 {thread.get_ident}
+     8946    0.005    0.000    0.006    0.000 /usr/lib64/python2.7/threading.py:1152(currentThread)
+     8946    0.005    0.000    0.036    0.000 /usr/lib64/python2.7/logging/__init__.py:721(format)
+     8946    0.005    0.000    0.018    0.000 /usr/lib64/python2.7/posixpath.py:104(splitext)
+     5915    0.004    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:123(east)
+     6238    0.004    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:139(ccw)
+     5897    0.004    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:120(west)
+     4699    0.004    0.000    0.004    0.000 /home/lenin/prg/icfpc/emu/emu.py:259(__init__)
+     8946    0.004    0.000    0.008    0.000 /usr/lib64/python2.7/logging/__init__.py:452(usesTime)
+     5909    0.004    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:136(cw)
+     8964    0.004    0.000    0.004    0.000 {method 'write' of 'file' objects}
+    10980    0.004    0.000    0.004    0.000 {method 'find' of 'str' objects}
+     2269    0.004    0.000    0.022    0.000 /usr/lib64/python2.7/site-packages/numpy/core/fromnumeric.py:1623(sum)
+     8946    0.004    0.000    0.004    0.000 {method 'acquire' of 'thread.lock' objects}
+     9174    0.003    0.000    0.005    0.000 /home/lenin/prg/icfpc/emu/emu.py:318(line_score)
+     8946    0.003    0.000    0.006    0.000 /usr/lib64/python2.7/logging/__init__.py:82(<lambda>)
+     8946    0.003    0.000    0.003    0.000 /usr/lib64/python2.7/threading.py:967(name)
+    18190    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}
+     8946    0.003    0.000    0.003    0.000 {sys._getframe}
+     8946    0.003    0.000    0.003    0.000 /usr/lib64/python2.7/logging/__init__.py:1339(getEffectiveLevel)
+     2303    0.003    0.000    0.012    0.000 /home/lenin/prg/icfpc/emu/emu.py:159(__init__)
+23165/23158    0.003    0.000    0.003    0.000 {len}
+     2269    0.002    0.000    0.042    0.000 /home/lenin/prg/icfpc/emu/emu.py:181(__clear_filled_lines)
+      253    0.002    0.000    0.002    0.000 /home/lenin/prg/icfpc/emu/emu.py:275(current_move_seq)
+      252    0.002    0.000    0.005    0.000 /home/lenin/prg/icfpc/emu/emu.py:240(phrase_score)
+     2269    0.002    0.000    0.002    0.000 {method 'nonzero' of 'numpy.ndarray' objects}
+    17892    0.002    0.000    0.002    0.000 /usr/lib64/python2.7/posixpath.py:51(normcase)
+     2269    0.002    0.000    0.004    0.000 /usr/lib64/python2.7/site-packages/numpy/core/fromnumeric.py:1372(nonzero)
+    14635    0.002    0.000    0.002    0.000 /home/lenin/prg/icfpc/emu/emu.py:312(ended)
+     7933    0.002    0.000    0.002    0.000 {method 'add' of 'set' objects}
+     8946    0.002    0.000    0.002    0.000 {time.time}
+     2269    0.002    0.000    0.009    0.000 /usr/lib64/python2.7/site-packages/numpy/lib/function_base.py:837(copy)
+     2236    0.001    0.000    0.001    0.000 /home/lenin/prg/icfpc/emu/emu.py:234(compute_points)
+       33    0.001    0.000    0.003    0.000 /home/lenin/prg/icfpc/emu/factor.py:25(perimeter)
+      222    0.001    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:143(hash)
+     8946    0.001    0.000    0.001    0.000 {method 'release' of 'thread.lock' objects}
+     4446    0.001    0.000    0.001    0.000 {method 'remove' of 'set' objects}
+     2269    0.001    0.000    0.017    0.000 /usr/lib64/python2.7/site-packages/numpy/core/_methods.py:31(_sum)
+      252    0.001    0.000    0.021    0.000 /home/lenin/prg/icfpc/emu/emu.py:377(try_commit_phrase)
+     8946    0.001    0.000    0.001    0.000 {posix.getpid}
+     1155    0.001    0.000    0.001    0.000 /home/lenin/prg/icfpc/emu/emu.py:67(neighbors)
+     4446    0.001    0.000    0.001    0.000 {method 'pop' of 'list' objects}
+       66    0.001    0.000    0.002    0.000 /home/lenin/prg/icfpc/emu/emu.py:91(calc_starting_position)
+     4909    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}
+     2269    0.001    0.000    0.001    0.000 {method 'tolist' of 'numpy.ndarray' objects}
+      888    0.000    0.000    0.001    0.000 {map}
+      261    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/decoder.py:372(raw_decode)
+     2520    0.000    0.000    0.000    0.000 {method 'lower' of 'str' objects}
+     2225    0.000    0.000    0.000    0.000 ./non-interactive.py:15(func)
+      222    0.000    0.000    0.000    0.000 {sorted}
+        1    0.000    0.000    0.000    0.000 {_curses.initscr}
+       33    0.000    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/factor.py:126(unit_perimeter)
+       33    0.000    0.000    0.006    0.000 /home/lenin/prg/icfpc/emu/emu.py:76(calc_symmetry_class)
+        1    0.000    0.000    1.237    1.237 ./non-interactive.py:139(main)
+       33    0.000    0.000    0.013    0.000 /home/lenin/prg/icfpc/emu/emu.py:16(__init__)
+      235    0.000    0.000    0.000    0.000 {min}
+        1    0.000    0.000    0.014    0.014 /home/lenin/prg/icfpc/emu/emu.py:426(__init__)
+      165    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:19(<lambda>)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:67(__init__)
+      8/6    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:388(_parse)
+      101    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:415(next)
+      139    0.000    0.000    0.000    0.000 {max}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/curses/__init__.py:28(initscr)
+     14/5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:64(_compile)
+       33    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:85(extent)
+    19/10    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:149(getwidth)
+      396    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:88(<genexpr>)
+       34    0.000    0.000    0.000    0.000 {numpy.core.multiarray.zeros}
+      396    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:87(<genexpr>)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/gettext.py:421(find)
+       14    0.000    0.000    0.001    0.000 /usr/lib64/python2.7/re.py:230(_compile)
+        6    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/gettext.py:130(_expand_lang)
+      165    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:21(<lambda>)
+        2    0.000    0.000    0.000    0.000 {open}
+      100    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:409(get_bits)
+        1    0.000    0.000    0.000    0.000 {_curses.setupterm}
+       12    0.000    0.000    0.000    0.000 {posix.stat}
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:433(_compile_info)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1263(add_argument)
+       11    0.000    0.000    0.354    0.032 /home/lenin/prg/icfpc/emu/locker.py:39(find_lock_states)
+      222    0.000    0.000    0.000    0.000 {hash}
+       40    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:191(__next)
+      7/5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:310(_parse_sub)
+       12    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/posixpath.py:68(join)
+       12    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/genericpath.py:15(exists)
+        1    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:268(__init__)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:154(__init__)
+       66    0.000    0.000    0.000    0.000 {math.floor}
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1182(__init__)
+      264    0.000    0.000    0.000    0.000 {ord}
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1400(_get_optional_kwargs)
+        1    0.000    0.000    0.000    0.000 {_curses.endwin}
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:428(_simple)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1742(_parse_known_args)
+        6    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/locale.py:363(normalize)
+        5    0.000    0.000    0.001    0.000 /usr/lib64/python2.7/sre_compile.py:567(compile)
+       48    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:139(__getitem__)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:686(parse)
+       34    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1234(register)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:256(_optimize_charset)
+       12    0.000    0.000    0.000    0.000 {method 'match' of '_sre.SRE_Pattern' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1707(parse_known_args)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1320(_add_action)
+        1    0.000    0.000    0.001    0.001 /usr/lib64/python2.7/argparse.py:1556(__init__)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2200(_get_values)
+        6    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/__init__.py:122(dump)
+        2    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:439(next)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:573(_format_args)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:212(iterencode)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:137(__delitem__)
+       51    0.000    0.000    0.000    0.000 {setattr}
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1789(take_action)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/locale.py:347(_replace_encoding)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1486(__init__)
+       32    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:210(get)
+       11    0.000    0.000    0.001    0.000 /usr/lib64/python2.7/re.py:192(compile)
+        1    0.000    0.000    0.000    0.000 {method 'read' of 'file' objects}
+       19    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:288(_iterencode_list)
+       16    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:341(_iterencode_dict)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1810(consume_optional)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2326(_get_formatter)
+       20    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:147(append)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:765(__init__)
+        7    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/UserDict.py:58(get)
+       28    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:135(__len__)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2020(_match_argument)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/encodings/__init__.py:49(normalize_encoding)
+       36    0.000    0.000    0.000    0.000 {method 'endswith' of 'str' objects}
+       19    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:417(_iterencode)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/gettext.py:527(dgettext)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1435(_pop_action_class)
+       10    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:546(isstring)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2156(_get_nargs_pattern)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:552(_code)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_compile.py:228(_compile_charset)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/__init__.py:257(load)
+       16    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+        8    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:266(_escape)
+       36    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/re.py:138(match)
+       14    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:90(__init__)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/gettext.py:565(gettext)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1439(_get_handler)
+        3    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/gettext.py:461(translation)
+       19    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:204(match)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:187(__init__)
+        5    0.000    0.000    0.000    0.000 {_sre.compile}
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1310(add_argument_group)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2252(_get_value)
+        4    0.000    0.000    0.000    0.000 {method 'find' of 'bytearray' objects}
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:199(__init__)
+        8    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/UserDict.py:18(__getitem__)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2055(_parse_optional)
+       40    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1508(_add_action)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:807(__init__)
+        9    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:83(closegroup)
+       11    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/locker.py:6(__init__)
+       10    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1238(_registry_get)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/decoder.py:361(decode)
+       10    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:95(_callable)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:865(__init__)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1680(_add_action)
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:557(_metavar_formatter)
+       12    0.000    0.000    0.000    0.000 {method 'iteritems' of 'dict' objects}
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1448(_check_conflict)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:101(__init__)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1887(consume_positionals)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:983(__init__)
+        5    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:143(__setitem__)
+        4    0.000    0.000    0.000    0.000 {method 'lstrip' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 {method 'group' of '_sre.SRE_Match' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2039(_match_arguments_partial)
+        2    0.000    0.000    0.000    0.000 {id}
+        1    0.000    0.000    0.000    0.000 {zip}
+        4    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:566(format)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:2277(_check_value)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/__init__.py:293(loads)
+        4    0.000    0.000    0.000    0.000 {_json.encode_basestring_ascii}
+        1    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:399(__init__)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/sre_parse.py:72(opengroup)
+        3    0.000    0.000    0.000    0.000 {method 'index' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1692(_get_positional_actions)
+        7    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/UserDict.py:70(__contains__)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1700(parse_args)
+        8    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:436(__iter__)
+        1    0.000    0.000    0.000    0.000 {_curses.cbreak}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/json/encoder.py:272(_make_iterencode)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:842(__init__)
+        6    0.000    0.000    0.000    0.000 {method 'reverse' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 {method 'fileno' of 'file' objects}
+        8    0.000    0.000    0.000    0.000 {chr}
+        5    0.000    0.000    0.000    0.000 {method 'extend' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 /home/lenin/prg/icfpc/emu/emu.py:406(__iter__)
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1160(__init__)
+        1    0.000    0.000    0.000    0.000 {iter}
+        5    0.000    0.000    0.000    0.000 {method 'remove' of 'list' objects}
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:836(__call__)
+        2    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:1602(identity)
+        3    0.000    0.000    0.000    0.000 {getattr}
+        1    0.000    0.000    0.000    0.000 /usr/lib64/python2.7/argparse.py:859(__call__)
+        9    0.000    0.000    0.000    0.000 {method 'translate' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 {method 'end' of '_sre.SRE_Match' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+
