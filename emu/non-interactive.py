@@ -106,7 +106,7 @@ def play(game, screen, game_index, game_count, silent):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', '-f', required=True)
+    parser.add_argument('--file', '-f', required=True, action='append')
     parser.add_argument('--output_file', '-o')
     parser.add_argument('-t', type=int)
     parser.add_argument('-m', type=int)
@@ -120,30 +120,33 @@ def main():
     if args.p:
         phrases.all = args.p
 
-    config = json.load(open(args.file))
+    results = []
 
-    try:
-        if args.verbose:
-            screen = curses.initscr()
-            curses.cbreak()
-        else:
-            screen = []
+    for input_file in args.file:
+        config = json.load(open(input_file))
 
-        results = []
-        game_index = 0
-        for game in emu.GameGenerator(config):
-            moves = play(game, screen, game_index, len(config['sourceSeeds']), not args.verbose)
-            game_index += 1
-            results.append({
-                'problemId': config['id'],
-                'seed': game.unit_generator.source_seed,
-                'solution': moves})
+        try:
+            if args.verbose:
+                screen = curses.initscr()
+                curses.cbreak()
+            else:
+                screen = []
 
-        json.dump(results, open(args.output_file, 'w') if args.output_file else sys.stdout, indent=4)
+            game_index = 0
+            for game in emu.GameGenerator(config):
+                moves = play(game, screen, game_index, len(config['sourceSeeds']), not args.verbose)
+                game_index += 1
+                results.append({
+                    'problemId': config['id'],
+                    'seed': game.unit_generator.source_seed,
+                    'solution': moves})
 
-    finally:
-        if args.verbose:
-            curses.endwin()
+
+        finally:
+            if args.verbose:
+                curses.endwin()
+
+    json.dump(results, open(args.output_file, 'w') if args.output_file else sys.stdout, indent=4)
 
 if __name__ == '__main__':
     main()
