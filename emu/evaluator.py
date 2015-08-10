@@ -7,6 +7,7 @@ import logging
 import sys
 import factor
 import math
+import threading
 
 sys.path.append('/Users/hr0nix/icfpc/icfpc')
 import bayes_opt
@@ -58,30 +59,36 @@ class Evaluator:
 
     @staticmethod
     def evaluate(configs, score_func):
-        overall_score = 0
+
+        thread_scores = [0] * len(configs)
+        threads = []
+
+        for i in xrange(len(configs)):
+
+            def thread_func(index):
+                total_score = 0
+
+                for game in emu.GameGenerator(configs[i]):
+                    Evaluator.play(game, score_func)
+
+                    cur_score = game.line_score() + game.phrase_score()
+                    total_score += cur_score
+
+                average_score = total_score // len(configs[i]['sourceSeeds'])
+                thread_scores[index] = average_score
+
+            thread = threading.Thread(target=thread_func, args=(i,))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+
+        overall_average_score = sum(thread_scores) // len(thread_scores)
 
         print
-
-        for config in configs:
-            total_score = 0
-
-            print 'Problem %d' % config['id']
-            for game in emu.GameGenerator(config):
-                Evaluator.play(game, score_func)
-
-                cur_score = game.line_score() + game.phrase_score()
-                print 'Seed %d: score is %d' % (game.unit_generator.source_seed, cur_score)
-
-                total_score += cur_score
-
-            average_score = total_score // len(config['sourceSeeds'])
-            print 'Average score is %d' % average_score
-            print
-
-            overall_score += average_score
-
-        overall_average_score = overall_score / len(configs)
         print 'Overall average score is %d' % overall_average_score
+        print 'Thread scores: %s' % thread_scores
         print
 
         return overall_average_score
